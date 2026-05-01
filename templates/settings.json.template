@@ -1,0 +1,114 @@
+{
+  "_comment": "harness-engineering settings.json.template v0.1.0 — generic, no private keys, no user-specific preferences. Install via: jq -s '.[0] * .[1]' ~/.claude/settings.json templates/settings.json.template > /tmp/settings-merged.json && mv /tmp/settings-merged.json ~/.claude/settings.json",
+  "_harness_version": "0.1.0",
+  "_harness_hooks_count": 8,
+
+  "enabledPlugins": {
+    "harness-engineering-plugin@harness-engineering-mp": true
+  },
+
+  "extraKnownMarketplaces": {
+    "harness-engineering-mp": {
+      "source": {
+        "path": "${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}",
+        "source": "directory"
+      }
+    }
+  },
+
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/stop-handoff-writer.sh",
+            "timeout": 120,
+            "type": "command"
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-handoff-read-gate.sh",
+            "timeout": 20,
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit|Bash|Task"
+      },
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-handoff-semantic-gate.sh",
+            "timeout": 20,
+            "type": "command"
+          }
+        ],
+        "matcher": "Write"
+      },
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-doc-sync-sop-enforce.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      },
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-plan-quality-gate.sh",
+            "timeout": 15,
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit"
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/post-tool-chmod-ci-gate.sh",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit"
+      }
+    ],
+
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/session-start-layer0-health.sh",
+            "timeout": 30,
+            "type": "command"
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/user-prompt-l42-workflow-trigger-gate.sh",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "*"
+      }
+    ]
+  }
+}

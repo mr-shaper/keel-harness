@@ -1,0 +1,9 @@
+# .harness/ — sprint runtime state, not for git history
+.harness/
+*.bak
+*.swp
+.DS_Store
+node_modules/
+
+# Local dev-time project CLAUDE.md (OSS users get templates/CLAUDE.md.project.template via install.sh)
+/CLAUDE.md

@@ -1,0 +1,70 @@
+{
+  "_comment": "harness-engineering jq-merge-schema.json v0.1.0 — describes how install.sh merges settings.json.template into user's existing ~/.claude/settings.json without clobbering user-specific keys.",
+  "_harness_version": "0.1.0",
+
+  "merge_strategy": "deep_merge_array_append",
+
+  "description": "Use 'jq -s' deep merge: user keys win for scalar fields, harness hooks are APPENDED (not replaced) to existing hooks arrays. Atomic backup written before any mutation.",
+
+  "merge_command": "jq -s '.[0] * .[1]' ~/.claude/settings.json templates/settings.json.template",
+
+  "selectors": [
+    ".hooks.PreToolUse[]",
+    ".hooks.Stop[]",
+    ".hooks.PostToolUse[]",
+    ".hooks.SessionStart[]",
+    ".hooks.UserPromptSubmit[]"
+  ],
+
+  "preserve_user_keys": [
+    ".theme",
+    ".model",
+    ".statusLine",
+    ".statusline",
+    ".permissions",
+    ".env",
+    ".alwaysThinkingEnabled",
+    ".skipAutoPermissionPrompt",
+    ".skipDangerousModePermissionPrompt",
+    ".extraKnownMarketplaces",
+    ".enabledPlugins"
+  ],
+
+  "atomic_backup": {
+    "enabled": true,
+    "path_template": "~/.claude/settings.json.harness-backup-$(date +%s)",
+    "description": "Written BEFORE merge. Restore with: cp <backup_path> ~/.claude/settings.json"
+  },
+
+  "dry_run": {
+    "enabled_by_default": true,
+    "command": "diff <(jq -S . ~/.claude/settings.json) <(jq -s -S '.[0] * .[1]' ~/.claude/settings.json templates/settings.json.template)",
+    "description": "Run dry-run diff first; user must confirm before atomic write"
+  },
+
+  "install_sh_steps": [
+    "1. Backup: cp ~/.claude/settings.json ~/.claude/settings.json.harness-backup-$(date +%s)",
+    "2. Dry-run diff (show user what will change)",
+    "3. Prompt user: 'Apply harness hooks to settings.json? [y/N]'",
+    "4. If confirmed: jq -s '.[0] * .[1]' ~/.claude/settings.json templates/settings.json.template > /tmp/settings-merged.json",
+    "5. Validate: jq . /tmp/settings-merged.json > /dev/null && echo 'valid JSON'",
+    "6. Atomic write: mv /tmp/settings-merged.json ~/.claude/settings.json",
+    "7. Verify: jq '.hooks | keys' ~/.claude/settings.json"
+  ],
+
+  "hooks_injected": {
+    "count": 8,
+    "list": [
+      { "name": "stop-handoff-writer.sh",              "event": "Stop",            "matcher": "*",                           "description": "Writes handoff MD at session end for cross-session continuity" },
+      { "name": "pre-tool-handoff-read-gate.sh",        "event": "PreToolUse",      "matcher": "Write|Edit|MultiEdit|Bash|Task", "description": "Enforces handoff read before any file mutation or bash execution" },
+      { "name": "pre-tool-handoff-semantic-gate.sh",    "event": "PreToolUse",      "matcher": "Write",                       "description": "Semantic similarity gate: blocks writes that diverge from current handoff intent" },
+      { "name": "user-prompt-l42-workflow-trigger-gate.sh", "event": "UserPromptSubmit", "matcher": "*",                    "description": "L42 enforcement: detects trigger keywords and injects workflow MD read" },
+      { "name": "pre-tool-doc-sync-sop-enforce.sh",     "event": "PreToolUse",      "matcher": "Bash",                        "description": "Enforces doc-sync SOP before Bash invocations that may trigger archival" },
+      { "name": "post-tool-chmod-ci-gate.sh",           "event": "PostToolUse",     "matcher": "Write|Edit|MultiEdit",        "description": "Validates file permissions and CI-critical attributes after writes" },
+      { "name": "session-start-layer0-health.sh",       "event": "SessionStart",    "matcher": "*",                           "description": "Layer 0 5-element health check at session start; blocks if critical files missing" },
+      { "name": "pre-tool-plan-quality-gate.sh",        "event": "PreToolUse",      "matcher": "Write|Edit",                  "description": "Quality gate for plan writes: enforces 5-element structure and PUA bar" }
+    ]
+  },
+
+  "idempotency_note": "jq deep merge is idempotent for scalar fields; hook arrays will grow on repeated runs. install.sh should deduplicate by checking if harness hook command string already exists in array before appending."
+}

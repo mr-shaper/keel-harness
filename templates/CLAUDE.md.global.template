@@ -1,0 +1,146 @@
+# $USER's AI System Guide
+
+> Auto-loaded each session. Keep concise; detailed config in DOC_GUIDE.md.
+
+## Decision Framework
+
+- **First Principles**: Strip away assumptions, Socratic questioning down to bedrock truth
+- **Complementary Goods Effect**: AI commoditizes execution → judgment / taste / trust become scarce
+- **PUA v4.0 Bar Raiser** (cross-project, cross-context): Discrete 6 tiers (`4.0` hardcore / `3.75` red-line SHIP threshold / `3.5+` worst acceptable / `3.5` below / `3.5-` severely below / `3.25` worst). **No 3.85/3.65/3.70 intermediate tiers**. **3.75 is the floor, not the reward** — exhaust all options to reach it. Self-evaluation must be evidence-aligned (red-line 4: no false reporting; "roughly 3.5 padding" = 3.25 termination signal). Details: `$CLAUDE_HOME/plugins/pua/skills/pua/SKILL.md`.
+- **PUA P10-9-8-7 Parallel Topology** (permanent law): **CEO → P10 (strategy) → P9 (Tech Lead, writes Prompts) → P8 (owns it, internally spawns P7) → P7**. 10 iron rules: ① **P9 dispatches multiple P8s in true parallel** (multiple Agent calls in same message) ② **P8 internally spawns P7**, P9 does not manage sub-topology ③ P10 does not write Task Prompts or manage P8 ④ **P9 never writes code** (role confusion = below 3.5) ⑤ CEO overrides P10 ⑥ File-domain isolation, grep verify ⑦ Same message multi-Agent = true parallel (not sequential) ⑧ Verification closure: P9 runs commands, no empty verbal claims ⑨ **P9 does not self-decide L4 strategy** (sprint kickoff / priority / Wave merge / Phase order / sprint outcome = L4 requires P10 ratification; violation triggers L41 rule) ⑩ **When user uses emphasis keywords, must read workflow** (Harness/OODC/PUA P10-9-8-7/Superpower pipeline/nested-parallel = must Read `$CLAUDE_HOME/workflows/<corresponding MD>.md` verbatim, L42 rule, memory recall not accepted). **Full diagram + decision tree + nested parallel**: `$CLAUDE_HOME/workflows/pua-topology.md`.
+
+## Skill Routing Rules
+
+- Session context injects **Top-10 high-frequency skill routes** (prefixed with a tool icon), use directly
+- When routing is uncertain: `python3 $CLAUDE_HOME/plugins/tacit-kb/scripts/kb.py query "keyword" --domain skills --top 3` to query KB then select
+- When user corrects a selection → actively record: `$KB extract --type decision --domain skills`
+- Composite needs (e.g., "infographic + slide") → decompose into single steps, route each independently
+
+## Skill Discovery Rules
+
+When looking for a Skill, **must** follow this order — no random searching:
+1. **Check shelf first**: `ls $CLAUDE_HOME/skills/shelf/` → directory name = skill name
+2. **Read SKILL.md**: `$CLAUDE_HOME/skills/shelf/<name>/SKILL.md` → understand usage
+3. **If Skill tool call fails**: execute CLI directly (path is in SKILL.md)
+4. **Never**: grep the full disk for skill names, guess via ToolSearch, or skip the shelf directory
+
+## AI Working Modes
+
+Complex tasks enter a working mode by type. AI checks the table → reads `$CLAUDE_HOME/workflows/<mode>.md` → follows steps.
+Simple tasks (<3 steps) are handled inline; no need to enter a working mode.
+
+### Plan Writing Rules
+
+**Any scenario requiring a Plan** (EnterPlanMode / superpowers:writing-plans / "help me plan" / "build an X"), **must** follow the superpower-pipeline methodology:
+1. First confirm project five elements (name / goal / type / directory / visibility)
+2. Check trimming table by project type; determine which Phases to execute
+3. Plan structure follows Phase 0→1→2→3→4 framework (kickoff → parallel exploration → decision convergence → development → wrap-up)
+4. Small changes (<3 steps) are exempt: handle inline, skip Pipeline
+5. Read `$CLAUDE_HOME/workflows/superpower-pipeline.md` for full process
+
+| Task Type | Mode | Trigger Keywords | Core Skills/Tools |
+|-----------|------|-----------------|-------------------|
+| **Full Engineering** | **superpower-pipeline** | **start SUPERPOWER / full engineering flow / full pipeline / "build an X" (large project)** | **Orchestrate all Superpowers + Workflows** |
+| **OODC Cognitive Loop** | **oodc-loop** | **OODC / oodc mode / full research / deep research / research first / observe orient decide create** | **Read `workflows/oodc-loop.md` → Skill("oodc:oodc"). Three-layer enforcement: L1 state machine + L2 Required Output (Done criteria) + L3 Hook. Each step Done = verifiable completion condition + Skill fallback + KB MANDATORY** |
+| Product Decision | product | MVP / user stories / feature priority | brainstorming |
+| Qualitative Research | research | competitive analysis / trends / comparison | WebSearch |
+| Quantitative Analysis | analyst | backtest / data / strategy | Python |
+| System Design | architect | architecture / technical proposal / tech selection | brainstorming, writing-plans |
+| Content Creation | content | write article / video script | content-creator |
+| Knowledge Distillation | knowledge | organize / distill / skill library | Notion MCP |
+| Ops/Deploy | operator | deploy / maintain / backup / health check | system-audit, verification |
+| Thinking Coach | — | help me think / should I / first principles | Socratic questioning (inline) |
+| Engineering Dev | — | write code / fix bug / test | Superpowers pipeline (small project inline) |
+| Task Management | — | /task / task / todo | task tool inline |
+| Doc Sync / Ingest | — | doc-sync / docsyn / sync docs / ingest / add to knowledge base / archive / Stop-hook auto | doc-sync v3 (3-layer closure + output_hint) |
+| **harness 24h cross-session** | **harness mode** | **`.harness/state` exists / 24h long session / cross-session handoff / "continue last time"** | See `## §harness mode Activation Rules` full contract below |
+
+## §harness mode Activation Rules (Project Entry Anchor)
+
+Automatically activates when entering a harness project (project with `.harness/state`).
+
+**Trigger Conditions** (any one triggers entry):
+1. cwd contains `.harness/state` file
+2. Single session has run ≥24h
+3. User says "continue last time" / "pick up sN" / "harness mode"
+4. SessionStart injection contains LATEST_HANDOFF_BANNER
+
+**After Activation: Required 3-Step Read** (fixed order):
+1. Read `<cwd>/CLAUDE.md` — project identity + bible entry + sprint state + hooks quick-ref
+2. Read `<cwd>/HARNESS_BIBLE.md` — §line 3-22 Bible First Law / §0.1 Layer 0 5 Elements / §9 canonical Category H rules (L16/L20/L21/L24-L37 incl. v1.12 NEW L34-L37; L19/L22/L23 not Category H)
+3. Read `<cwd>/.harness/handoff-sN-to-sN+1.md` (latest sN) — authoritative next_action
+
+**3 Red Lines** (violation immediately drops below 3.75 baseline → L3+ pressure):
+- **Bible First Law** (`$CLAUDE_HOME` only single deployment / codepilot 0 physical changes) — details in HARNESS_BIBLE.md §line 3-22
+- **Layer 0 5-Element Rule** (elements a/b/c/d/e: missing any = silent dead) — details in HARNESS_BIBLE.md §0.1 + `<cwd>/docs/layer-0-spec.md`
+- **5 Self-Check Q4 Fix Method B** (main body grep LATEST_HANDOFF_NAME literal string, no fallback to fuzzy terms) — details in HARNESS_BIBLE.md §9 L30
+
+**Cat-H L34-L37 (v1.12 ratified)**:
+- **L34** (subtree mp symlink single-source-of-truth law) — codepilot mp symlink must be unified; cp sync dual copies not accepted
+- **L35** (Plugin loader vs USER runtime config separation law) — enforce-core hooks must live in USER-level settings.json, not project-level
+- **L36** (tail -n line safe, tail -c byte unsafe law) — use tail with line count only, not byte count
+- **L37** (sub-agent + resume + review-agent gate compatibility law, fix (c) ratified) — sub-agent/resume task prompts must explicitly Read handoff; review-agent adds `[ROLE: review-agent]` to skip Q1-Q5
+
+**Cat-H L31-L32 (v1.11 ratified, retained for history)**:
+- **L31** (CLAUDE.md revision must pass 6-dimension ≥0.99 hardcore, permanent cross-session) — applies to W4 LAST and beyond
+- **L32** (Runtime fire ≠ Code ship; Romeo audit dimension-blind-spot law) — Romeo audit must include fresh terminal hook-trace as real incremental evidence
+
+**4-Layer Loading Mechanism + Skill Loading SOP**: Details in `$CLAUDE_HOME/workflows/skill-loading-sop.md`
+
+**Full Rules** (scope_forbidden 25 conditions / Cat-H 19 conditions / 33+ hooks quick-ref / Cumulative read+write symmetry / Semantic gate / plans-session exclusion / PUA P10-9-8-7 10 iron rules / doc-sync skill primary entry KB archival / L42 workflow MD emphasis-keyword trigger routing): After entering project, Read `<cwd>/CLAUDE.md` + `<cwd>/HARNESS_BIBLE.md` — all rules are there. Do not inline here (avoids dual-source drift, L26 rule strictly enforced).
+
+## Session Lifecycle
+
+### Session Start
+- Memory context hook auto-injects historical context
+- KB wakeup auto-injects cognitive baseline (72h cache, cross-session persistence)
+- session-context.sh checks config file freshness
+- If key files were recently modified, **re-read immediately** before starting work
+
+### During Work
+- Memory system auto-records each tool use (no manual remember needed)
+- Multi-step tasks use TaskCreate/TaskUpdate to track progress
+
+### Strategic Memory
+
+Auto-capture handles routine tasks. Actively save memory in these scenarios:
+
+| Scenario | Title Format | Importance |
+|----------|-------------|-----------|
+| Architecture Decision | [Decision] xxx | critical |
+| Bug Root Cause | [Fix] xxx | high |
+| Lesson Learned | [Lesson] xxx | high |
+| User Preference | [Pref] xxx | high, scope: global |
+| Tool / Pattern Discovery | [Discovery] xxx | normal |
+
+Memory search 3 layers: search → timeline → get_observations, no skipping steps.
+
+### After Engineering Changes / Ingest Archive Trigger
+
+doc-sync **v3 3-layer closure** (Stop-hook auto-triggers; no manual /doc-sync needed):
+
+**Trigger words**: `doc-sync` / `docsyn` / `sync docs` / `update docs` / `ingest` / `add to knowledge base` / `archive` / `Q&A archive` / `add conversation to knowledge base` / Stop-hook auto
+
+**Routing SSOT**: `$CLAUDE_HOME/skills/shelf/doc-sync/references/routes.md` v3 — **6 change_type categories**:
+- `bug_fix` / `arch_upgrade` / `new_skill` / `research` / `methodology` / `qa_archive` (v3 new)
+- Each entry includes `[OUTPUT-HINT] drawio/ljg/content` auto-recommending output skill for loop closure
+
+**Mandatory Rule (any KB ingest/extract is permanent cross-session)**:
+
+**Single Entry Point**: `bash $CLAUDE_HOME/skills/shelf/doc-sync/scripts/kb-ingest-compile.sh <path> <domain> [--hint <decision|exemplar|analogy|evolution>]`
+
+**Prohibited**:
+- Bare `python3 $CLAUDE_HOME/plugins/tacit-kb/scripts/kb.py ingest <path>` — skips compound-selfcheck 3 laws + skips frontmatter injection + skips compile-hint = Compound failure
+- Bare `kb.py extract --type X --write` without doc-sync routing layer (no fingerprint + no routes.md routing + no audit)
+- Direct writes bypassing the pipeline entirely
+
+**3-Layer Internalization** (skill entry point orchestrates; AI does not call lower layers directly):
+1. **Routing layer** (skill single entry): SKILL.md v3 + `scripts/docsyn-state.sh fingerprint` + `routes.md` routing
+2. **Backend layer** (tacit-kb, **called only internally by skill**): `kb.py` orchestration, atomic 15-20 knowledge points
+3. **Plugin hook layer** (compound-selfcheck-plugin): PostToolUse Write/Edit, **LOC>100 OR BYTES>5000** auto Compound 3-law reminder
+
+### Session End
+- Memory summary-hook auto-summarizes session
+
+### Self-Check
+- When user says "system self-check": run full system audit

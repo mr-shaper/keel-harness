@@ -1,0 +1,44 @@
+# <PROJECT_NAME> — 项目 CLAUDE.md
+
+> <PROJECT_NAME> 工程化项目. 新独立项目, 编号 S1+ (大写 S).
+
+## 进入本项目工作的开场必动作
+
+1. **Read 5 必读** (handoff-read-gate enforce):
+   - `.harness/handoff-S<N-1>-to-S<N>.md` (最新, 权威 next_action)
+   - `<PROJECT_PLAN_PATH>` (完整 ratified Plan)
+   - `~/.claude/workflows/kb-ingestion-sop.md` §10 (真 vault_root, 路径假设防复发律)
+   - `~/.claude/CLAUDE.md` (PUA 10 铁律 + 工作偏好)
+   - `docs/notes.md` 或项目 retro 关键段 (如有)
+
+2. **答 5 自检** (Stop hook 扫):
+   - Q1 项目: `<PROJECT_NAME>` (新独立项目, 确认项目身份)
+   - Q2 next_action: 当前 handoff §next_action 引 (字面引用, 不自编)
+   - Q3 明确度: ratified Plan 核心决策 D1-DN 已读
+   - Q4 LATEST_HANDOFF_NAME 字面 (grep 修法 B, 不 fallback 模糊词)
+   - Q5 当前阶段/周次 (按 Plan 路线表对应)
+
+## 圣经原则
+
+- **fact-driven**: claim 必 evidence-paste, 不空报
+- **P9 不下场写代码**: 写代码 = 角色错位
+- **同 message 多 Agent = 真并行**: 不 sequential
+- **文件域不重叠 grep verify**: 跨 agent 写文件前先确认无重叠
+- **verification-before-completion**: claim "done" 必跑命令 paste output
+
+## 项目路线 (按 Plan 填充)
+
+| Week | 内容 | Phase |
+|---|---|---|
+| W1 | <NEXT_ACTION> | Phase 0 |
+| W2 | — | Phase 1 |
+| W3 | — | Phase 2 |
+| W4 | — | Phase 3 |
+| W5 | — | Phase 3 |
+| W6 | — | Phase 3 |
+| W7 | — | Phase 4 |
+| W8 | — | Phase 4 |
+
+## 详见 Plan
+
+完整: `<PROJECT_PLAN_PATH>`

@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+# pre-commit — Layer 4 PII blacklist + author email gate
+# Source of truth: manifest.json .private_blacklist_keywords[] + .blacklist_regex_patterns[]
+# B1 钦定: author email must be mrshaper@users.noreply.github.com
+# Compatible: bash 3.2+ (macOS), grep -E (no -P needed)
+
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+MANIFEST="${REPO_ROOT}/manifest.json"
+REQUIRED_EMAIL="mrshaper@users.noreply.github.com"
+EXIT_CODE=0
+
+# ── SKIP_PATHS: files exempt from PII scan (blacklist SSOT / self-reference / mock data) ──
+# These files legitimately contain blacklist keywords as literals (definitions, not leaks).
+# Entries ending with '/' are treated as directory prefix matches (all files under that dir).
+SKIP_PATHS=(
+  "manifest.json"           # blacklist SSOT — must contain keyword literals
+  "hooks/pre-commit"        # self-reference: contains REQUIRED_EMAIL + keyword patterns
+  "sync.sh"                 # references manifest blacklist patterns as source code
+  "LICENSE"                 # Apache-2.0 boilerplate
+  ".gitignore"              # project hygiene
+  "README.md"               # OSS identity: contains GitHub URLs + optional plugin section
+  "tests/test-pre-commit.sh" # mock PII test data (by design)
+  "tests/test-sync.sh"      # mock PII test data (by design)
+  "templates/"              # OSS template files: contain hook names with substring false positives
+  "docs/"                   # internal audit/design docs: may contain notes with private terms
+)
+
+# ── CONTEXT_FILTERS: line-level exemptions (regex → skip that line) ──────────
+# GitHub repo URLs containing username are OSS-necessary, not PII leaks.
+CONTEXT_FILTER_PATTERNS=(
+  'github\.com/[a-zA-Z0-9_-]+/'
+)
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+is_skip_path() {
+  local file="$1"
+  for skip in "${SKIP_PATHS[@]}"; do
+    # Directory prefix: entry ends with '/'
+    if [[ "${skip}" == */ ]]; then
+      if [[ "${file}" == "${skip}"* ]]; then
+        return 0
+      fi
+    else
+      if [[ "${file}" == "${skip}" ]]; then
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
+
+# Apply context filters: remove lines that match any CONTEXT_FILTER_PATTERNS
+apply_context_filters() {
+  local content="$1"
+  local filtered="${content}"
+  for cf_pat in "${CONTEXT_FILTER_PATTERNS[@]}"; do
+    filtered="$(grep -vE "${cf_pat}" <<< "${filtered}" 2>/dev/null || true)"
+  done
+  echo "${filtered}"
+}
+
+# ── 0. Sanity: manifest must exist ──────────────────────────────────────────
+if [[ ! -f "${MANIFEST}" ]]; then
+  echo "[pre-commit] ERROR: manifest.json not found at ${MANIFEST}" >&2
+  exit 1
+fi
+
+# ── 1. Author email gate (B1 钦定) ───────────────────────────────────────────
+CURRENT_EMAIL="$(git config user.email 2>/dev/null || true)"
+if [[ "${CURRENT_EMAIL}" != "${REQUIRED_EMAIL}" ]]; then
+  echo "[pre-commit] ABORT: author email '${CURRENT_EMAIL}' != required '${REQUIRED_EMAIL}'" >&2
+  echo "[pre-commit] Fix: git config user.email '${REQUIRED_EMAIL}'" >&2
+  exit 1
+fi
+
+# ── 2. Collect staged files (bash 3.2 compatible, no mapfile) ───────────────
+STAGED_FILES_RAW="$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)"
+
+if [[ -z "${STAGED_FILES_RAW}" ]]; then
+  exit 0
+fi
+
+# ── 3. Extract blacklist keywords as pipe-separated pattern (python3 stdlib) ─
+KEYWORD_PATTERN="$(python3 -c "
+import json, sys
+m = json.load(open('${MANIFEST}'))
+kw = m.get('private_blacklist_keywords', [])
+# Escape special ERE chars in each keyword, join with |
+import re
+escaped = [re.escape(k) for k in kw]
+print('|'.join(escaped))
+" 2>/dev/null)"
+
+# ── 4. Extract regex patterns as newline-separated list ──────────────────────
+REGEX_PATTERNS="$(python3 -c "
+import json
+m = json.load(open('${MANIFEST}'))
+rx = m.get('blacklist_regex_patterns', [])
+for r in rx:
+    print(r)
+" 2>/dev/null)"
+
+# ── 5. Scan each staged file ─────────────────────────────────────────────────
+while IFS= read -r FILE; do
+  [[ -z "${FILE}" ]] && continue
+
+  # Check SKIP_PATHS exception list
+  if is_skip_path "${FILE}"; then
+    echo "[pre-commit] SKIP ${FILE} (in exception list)" >&2
+    continue
+  fi
+
+  ABS_FILE="${REPO_ROOT}/${FILE}"
+  [[ -f "${ABS_FILE}" ]] || continue
+
+  # Read file content once
+  FILE_CONTENT="$(cat "${ABS_FILE}" 2>/dev/null || true)"
+  [[ -z "${FILE_CONTENT}" ]] && continue
+
+  # Apply context filters (remove OSS-necessary lines like GitHub repo URLs)
+  FILTERED_CONTENT="$(apply_context_filters "${FILE_CONTENT}")"
+
+  # 5a. Keyword grep (case-insensitive, ERE with | alternation)
+  if [[ -n "${KEYWORD_PATTERN}" ]]; then
+    MATCH="$(grep -inE "${KEYWORD_PATTERN}" <<< "${FILTERED_CONTENT}" 2>/dev/null | head -5 || true)"
+    if [[ -n "${MATCH}" ]]; then
+      echo "[pre-commit] ABORT: PII keyword found in staged file: ${FILE}" >&2
+      # Diagnostic: identify which keyword(s) matched
+      python3 -c "
+import re, json, sys
+content = open('${ABS_FILE}').read()
+m = json.load(open('${MANIFEST}'))
+kw = m.get('private_blacklist_keywords', [])
+hits = []
+for k in kw:
+    if re.search(re.escape(k), content, re.IGNORECASE):
+        hits.append(k)
+if hits:
+    print('[pre-commit]   hit keywords: ' + ', '.join(hits), file=sys.stderr)
+" 2>&1 >&2 || true
+      while IFS= read -r line; do
+        echo "  >> ${line}" >&2
+      done <<< "${MATCH}"
+      EXIT_CODE=1
+    fi
+  fi
+
+  # 5b. Regex patterns (each pattern individually, ERE)
+  if [[ -n "${REGEX_PATTERNS}" ]]; then
+    while IFS= read -r PATTERN; do
+      [[ -z "${PATTERN}" ]] && continue
+      RMATCH="$(grep -inE "${PATTERN}" <<< "${FILTERED_CONTENT}" 2>/dev/null | head -3 || true)"
+      if [[ -n "${RMATCH}" ]]; then
+        echo "[pre-commit] ABORT: PII regex /${PATTERN}/ matched in: ${FILE}" >&2
+        echo "[pre-commit]   hit regex pattern: ${PATTERN}" >&2
+        while IFS= read -r line; do
+          echo "  >> ${line}" >&2
+        done <<< "${RMATCH}"
+        EXIT_CODE=1
+      fi
+    done <<< "${REGEX_PATTERNS}"
+  fi
+
+done <<< "${STAGED_FILES_RAW}"
+
+if [[ "${EXIT_CODE}" -ne 0 ]]; then
+  echo "[pre-commit] Commit blocked. Remove PII from staged files and retry." >&2
+  exit 1
+fi
+
+exit 0
