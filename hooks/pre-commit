@@ -23,6 +23,9 @@ SKIP_PATHS=(
   "README.md"               # OSS identity: contains GitHub URLs + optional plugin section
   "tests/test-pre-commit.sh" # mock PII test data (by design)
   "tests/test-sync.sh"      # mock PII test data (by design)
+  "tests/test-install.sh"   # mock test data
+  "tests/test-red-team.sh"  # mock attack data
+  "tests/red-team/"         # red-team fixtures: mock PII attack vectors (by design, prefix match)
   "templates/"              # OSS template files: contain hook names with substring false positives
   "docs/"                   # internal audit/design docs: may contain notes with private terms
 )

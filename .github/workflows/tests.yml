@@ -1,0 +1,94 @@
+name: Tests (macOS + Linux)
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+      - "feature/**"
+
+jobs:
+  test:
+    name: Run tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install jq
+          else
+            sudo apt-get update -y && sudo apt-get install -y jq
+          fi
+        shell: bash
+
+      - name: Verify python3 available
+        run: python3 --version
+
+      - name: Install shellcheck
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install shellcheck
+          else
+            sudo apt-get update -y && sudo apt-get install -y shellcheck
+          fi
+        shell: bash
+
+      - name: ShellCheck all shell scripts
+        run: |
+          echo "==> ShellCheck: tests/*.sh"
+          shellcheck tests/*.sh
+          echo "==> ShellCheck: sync.sh"
+          shellcheck sync.sh
+          echo "==> ShellCheck: install.sh"
+          shellcheck install.sh
+          echo "==> ShellCheck: hooks/pre-commit"
+          shellcheck hooks/pre-commit
+          echo "==> ShellCheck PASSED"
+        shell: bash
+
+      - name: Run test-sync.sh
+        run: bash tests/test-sync.sh
+        shell: bash
+
+      - name: Run test-pre-commit.sh
+        run: bash tests/test-pre-commit.sh
+        shell: bash
+
+      - name: Run test-install.sh
+        env:
+          HARNESS_HOME: ${{ runner.temp }}/harness-test-home
+        run: |
+          mkdir -p "$HARNESS_HOME"
+          bash tests/test-install.sh
+        shell: bash
+
+      - name: Run test-red-team.sh (if exists)
+        run: |
+          if [[ -f tests/test-red-team.sh ]]; then
+            echo "==> Running test-red-team.sh"
+            bash tests/test-red-team.sh
+          else
+            echo "==> tests/test-red-team.sh not found, skipping"
+          fi
+        shell: bash
+
+      - name: Test summary
+        if: success()
+        run: |
+          echo "============================================"
+          echo "  All tests PASSED on ${{ matrix.os }}"
+          echo "  ShellCheck + test-sync + test-pre-commit"
+          echo "  + test-install + test-red-team (if present)"
+          echo "============================================"
