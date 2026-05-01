@@ -26,6 +26,7 @@ SKIP_PATHS=(
   "tests/test-install.sh"   # mock test data
   "tests/test-red-team.sh"  # mock attack data
   "tests/red-team/"         # red-team fixtures: mock PII attack vectors (by design, prefix match)
+  "demo/"                   # asciinema cast files contain mock PII for honesty demos (by design, prefix match)
   "templates/"              # OSS template files: contain hook names with substring false positives
   "docs/"                   # internal audit/design docs: may contain notes with private terms
 )

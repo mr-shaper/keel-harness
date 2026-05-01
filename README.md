@@ -3,8 +3,12 @@
 > Harness for Claude Code: 24h cross-session continuity + canonical honesty enforcement + P10-9-8-7 nested parallel agent topology — Karpathy's agentic engineering, made enforceable.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://img.shields.io/badge/CI-coming_W5-lightgrey)](https://github.com/mrshaper/harness-engineering/actions)
+[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/mrshaper/harness-engineering/actions)
 [![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](https://github.com/mrshaper/harness-engineering/releases)
+
+![5 vocab + 4 gaps demo](demo/demo-4.gif)
+
+> *90 seconds to grok harness. The 4 gaps it fills + the 5 words we want in the agentic engineering vocabulary. Reproduce with `bash demo/record.sh 4`.*
 
 ---
 
@@ -125,6 +129,20 @@ power user.
 - `manifest.json` — Kernel file whitelist + private blacklist keywords (what stays in, what never ships)
 - `install.sh` — One-line bootstrap (ships W3)
 - `LICENSE` — Apache-2.0
+
+---
+
+## Demos (asciinema → agg-rendered GIFs)
+
+Three additional reproducible demos cover the gaps in motion:
+
+| # | Demo | Length | Gap |
+|---|---|---|---|
+| 1 | [24h Cross-Session Continuity](demo/demo-1.gif) | 3 min | Gap 1 — AI memory loss |
+| 2 | [4-Layer Nested Parallel — 7 P8 → 7× speedup](demo/demo-2.gif) | 2 min | Gap 3 — P9 role drift |
+| 3 | [Canonical Honesty Hooks — 5-layer defense](demo/demo-3.gif) | 2.5 min | Gap 2 — paper victory |
+
+Reproduce locally: `brew install asciinema agg && bash demo/record.sh all`
 
 ---
 
