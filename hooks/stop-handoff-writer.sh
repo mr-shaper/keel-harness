@@ -72,6 +72,20 @@ except Exception:
   fi
 fi
 
+# ── Smart next_action: pull from latest handoff-SN-to-SN+1.md if P9 already wrote one ──
+# Iron rule: Stop hook does ZERO AI summary. But if P9/CEO inline-wrote a handoff
+# with a real next_action, defer to that authoritative source instead of TBD placeholder.
+NEXT_ACTION="TBD-next-action-absent"
+LATEST_AUTHORITATIVE="$(ls -1t "${HARNESS_DIR}"/handoff-S*-to-S*.md 2>/dev/null | head -1)"
+if [[ -n "${LATEST_AUTHORITATIVE}" ]] && [[ -f "${LATEST_AUTHORITATIVE}" ]]; then
+  EXTRACTED="$(awk '/^next_action:/{flag=1} flag{print; if(/"$/) exit}' "${LATEST_AUTHORITATIVE}" 2>/dev/null \
+    | sed 's/^next_action: *//;s/^"//;s/"$//' | head -c 2000)"
+  if [[ -n "${EXTRACTED}" ]] && [[ "${EXTRACTED}" != "TBD-"* ]]; then
+    NEXT_ACTION="${EXTRACTED}"
+    NEXT_ACTION_SOURCE="${LATEST_AUTHORITATIVE##*/}"
+  fi
+fi
+
 # ── Write handoff.md ─────────────────────────────────────────────────────────
 HANDOFF_FILE="${HARNESS_DIR}/handoff.md"
 
@@ -102,7 +116,9 @@ ${LAST_USER_PROMPT}
 
 ## §next_action
 
-TBD-next-action-absent
+${NEXT_ACTION}
+
+${NEXT_ACTION_SOURCE:+_(source: ${NEXT_ACTION_SOURCE} authoritative; this Stop hook deferred to it)_}
 
 ## §verification-checklist
 

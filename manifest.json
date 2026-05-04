@@ -21,6 +21,7 @@
     "sync.sh",
     "README.md",
     "LICENSE",
+    "HARNESS_BIBLE.md",
     "templates/CLAUDE.md.global.template",
     "templates/CLAUDE.md.project.template",
     "templates/settings.json.template",

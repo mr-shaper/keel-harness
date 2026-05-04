@@ -21,6 +21,7 @@ SKIP_PATHS=(
   "LICENSE"                 # Apache-2.0 boilerplate
   ".gitignore"              # project hygiene
   "README.md"               # OSS identity: contains GitHub URLs + optional plugin section
+  "HARNESS_BIBLE.md"        # project bible: documents brand name + maintainer references by design
   "tests/test-pre-commit.sh" # mock PII test data (by design)
   "tests/test-sync.sh"      # mock PII test data (by design)
   "tests/test-install.sh"   # mock test data
