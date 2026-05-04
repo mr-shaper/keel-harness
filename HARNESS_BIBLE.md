@@ -97,7 +97,7 @@ Two handoff files coexist; both are authoritative for different purposes:
 ## §sprint baseline (S2 close)
 
 - Project name: **keel-harness** (was harness-engineering, W6 renamed per CEO directive)
-- GitHub: `mr-shaper/keel-harness` (PRIVATE, W7 launch flips to PUBLIC)
+- GitHub: `mr-shaper/keel-harness` (Apache-2.0, public OSS)
 - Plan: rev D (S1 W1 Day 1 ratified) + W6/W6.5/W6.6 patches in handoff-S2-to-S3.md §10+
 - Latest commit: see `git log --oneline -1`
 - 5 test suites: `bash tests/test-{sync,pre-commit,install,red-team,manifest-completeness}.sh`

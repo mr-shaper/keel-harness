@@ -55,6 +55,13 @@ Simple tasks (<3 steps) are handled inline; no need to enter a working mode.
 | Doc Sync / Ingest | — | doc-sync / docsyn / sync docs / ingest / add to knowledge base / archive / Stop-hook auto | doc-sync v3 (3-layer closure + output_hint) |
 | **harness 24h cross-session** | **harness mode** | **`.harness/state` exists / 24h long session / cross-session handoff / "continue last time"** | See `## §harness mode Activation Rules` full contract below |
 
+## Agent Execution Standard
+
+For any multi-step plan (≥3 steps OR multi-file), follow `docs/agent-execution-standard.md`.
+
+This is mandatory — skipping the standard's pre-execution workflow reads
+triggers UserPromptSubmit hooks that warn or block.
+
 ## §harness mode Activation Rules (Project Entry Anchor)
 
 Automatically activates when entering a harness project (project with `.harness/state`).

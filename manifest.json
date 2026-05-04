@@ -37,13 +37,20 @@
     "plugins/compound-selfcheck-plugin/hooks/post-tool-compound-check.sh",
     "plugins/compound-selfcheck-plugin/README.md",
     "docs/sprint-kickoff-checklist.md",
+    "docs/agent-execution-standard.md",
     "scripts/sync-self-check.sh",
     "docs/visuals/topology-infograph.html",
     "docs/visuals/topology-infograph.png",
     "docs/visuals/pipeline-whiteboard.html",
     "docs/visuals/pipeline-whiteboard.png",
     "docs/visuals/gaps-sketchnote.html",
-    "docs/visuals/gaps-sketchnote.png"
+    "docs/visuals/gaps-sketchnote.png",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    ".github/ISSUE_TEMPLATE/bug_report.md",
+    ".github/ISSUE_TEMPLATE/feature_request.md",
+    ".github/pull_request_template.md"
   ],
   "manual_sync_files": [
     "templates/CLAUDE.md.global.template",

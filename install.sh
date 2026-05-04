@@ -12,8 +12,7 @@
 #   Phase 4:   Optional plugin flags (claude-mem / tacit-kb / docsync — URL only)
 #   Phase 5:   Layer 0 5-element health check
 #
-# License: MIT (install.sh itself). Components may carry their own licenses.
-# See README.md §License for details.
+# License: Apache-2.0 (matches repository LICENSE)
 
 set -euo pipefail
 
@@ -62,7 +61,7 @@ REQUIRED upstream plugins (auto-detected, install BEFORE running this script):
     git clone https://github.com/tanweai/pua ~/.claude/plugins/pua
 
 BUNDLED plugin (auto-installed by this script in Phase 1.5):
-  OODC (Apache-2.0, by mr-shaper) — bundled in plugins/oodc/, copied to
+  OODC (Apache-2.0) — bundled in plugins/oodc/, copied to
   ~/.claude/plugins/oodc/ during install.
 
 ENVIRONMENT:

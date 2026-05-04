@@ -37,7 +37,7 @@ NLM answers only. Down → `[⚠️ non-NLM]`.
 `github:` {findings} | `x:` {insights} | `nlm:` {Q&A} | `local:` {assets} | `source_count:` N
 
 Done = source_count ≥ 3 (fast) / ≥ 20 (slow). Each field: concrete finding, not "no results".
-Empty field (slow) → do not proceed. Slow: `Bash: sed -i '' 's/step=.*/step=ORIENT/' ~/.claude/.oodc-state-{project}`
+Empty field (slow) → do not proceed. Slow: `Bash: perl -pi -e 's/step=.*/step=ORIENT/' ~/.claude/.oodc-state-{project}`
 
 ## ORIENT
 
@@ -53,7 +53,7 @@ See `references/orient-playbook.md`.
 `assumptions:` [...] | `experts_invoked:` [Skill IDs] | `pua:` flavor/pressure/redlines/switch | `pipeline_phases:` [...] | `dominant:` ... | `minority:` ... | `recommendation:` ... | `confidence:` H/M/L
 
 Done = experts_invoked: ≥1 Skill call with verdict. assumptions: ≥1 confidence ≠ High.
-`experts_invoked` empty → do not proceed. Slow: `sed -i '' 's/step=.*/step=DECIDE/' ~/.claude/.oodc-state-{project}`
+`experts_invoked` empty → do not proceed. Slow: `perl -pi -e 's/step=.*/step=DECIDE/' ~/.claude/.oodc-state-{project}`
 
 **Fast-loop minimum** (non-negotiable):
 - Assumptions: 3 × evidence/counter/confidence
@@ -74,7 +74,7 @@ See `references/decide-template.md`.
 `five_elements:` {...} | `decisions:` [DP-1..N] | `consistency:` PASS/FAIL | `user_confirmed:` false
 
 Done = consistency: PASS (top numbers = bottom counts). user_confirmed: true.
-**HARD STOP**: Wait for user. Slow: `sed -i '' 's/step=.*/step=CREATE/' ~/.claude/.oodc-state-{project}`
+**HARD STOP**: Wait for user. Slow: `perl -pi -e 's/step=.*/step=CREATE/' ~/.claude/.oodc-state-{project}`
 
 ## CREATE
 

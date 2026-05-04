@@ -127,7 +127,7 @@ catch. Cross-audit consensus fixes:
 - **`manifest.json`** — `private_blacklist_keywords` adds three more terms:
   `harness-engineering-mp` (the obsolete pre-rename namespace),
   `MBP` (private device abbreviation),
-  `Roy` (private maintainer first name). Total blacklist this sprint: 11 new
+  `Roy` (a maintainer's given-name token added to prevent future leakage). Total blacklist this sprint: 11 new
   scope-forbidden terms (`Maintainer`, `CLAUDE_CONFIG_DIR`, `MBP`, `Mobile
   Documents`, `Mrs-Mac-mini`, `Mrs-MacBook-Pro`, `Roy`, `claude-codepilot`,
   `claude-roy` was already there, `codepilot`, `dual-runtime`, `harness-engineering-mp`).

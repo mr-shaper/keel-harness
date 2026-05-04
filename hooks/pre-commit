@@ -23,6 +23,9 @@ SKIP_PATHS=(
   "README.md"               # OSS identity: contains GitHub URLs + optional plugin section
   "README.zh-CN.md"         # bilingual sibling: same OSS identity exemption as README.md
   "CHANGELOG.md"            # release history: documents brand sweep + blacklist additions in retrospective context
+  "SECURITY.md"             # security policy: legitimate use of project noreply contact email
+  "CODE_OF_CONDUCT.md"      # Contributor Covenant: legitimate use of project noreply contact email
+  "CONTRIBUTING.md"         # contributor guide: legitimate references to project author handle
   "HARNESS_BIBLE.md"        # project bible: documents brand name + maintainer references by design
   "tests/test-pre-commit.sh" # mock PII test data (by design)
   "tests/test-sync.sh"      # mock PII test data (by design)
@@ -40,6 +43,7 @@ SKIP_PATHS=(
 # GitHub repo URLs containing username are OSS-necessary, not PII leaks.
 CONTEXT_FILTER_PATTERNS=(
   'github\.com/[a-zA-Z0-9_-]+/'
+  'raw\.githubusercontent\.com/[a-zA-Z0-9_-]+/'
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

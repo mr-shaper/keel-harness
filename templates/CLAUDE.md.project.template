@@ -18,6 +18,13 @@
    - Q4 LATEST_HANDOFF_NAME 字面 (grep 修法 B, 不 fallback 模糊词)
    - Q5 当前阶段/周次 (按 Plan 路线表对应)
 
+## Agent Execution Standard
+
+For any multi-step plan (≥3 steps OR multi-file), follow `docs/agent-execution-standard.md`.
+
+This is mandatory — skipping the standard's pre-execution workflow reads
+triggers UserPromptSubmit hooks that warn or block.
+
 ## 圣经原则
 
 - **fact-driven**: claim 必 evidence-paste, 不空报

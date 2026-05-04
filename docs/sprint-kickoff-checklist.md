@@ -49,7 +49,7 @@ Verify that all required scripts, plugin directories, and settings files are phy
 |------|---------|--------------|
 | Hook scripts exist | `ls ${HARNESS_ROOT}/hooks/` | Expected `.sh` files listed |
 | Plugin directories present | `ls ${HARNESS_ROOT}/plugins/` | Plugin subdirs visible |
-| Settings file present | `ls ${HARNESS_ROOT}/.claude/settings.json` | File path printed |
+| Settings file present | `ls ${CLAUDE_HOME:-~/.claude}/settings.json` | File path printed |
 | Manifest present | `ls ${HARNESS_ROOT}/manifest.json` | File path printed |
 
 **Evidence command example:**
@@ -68,7 +68,7 @@ Verify file contents match expectations: correct line counts, required keywords 
 | Hook script non-empty | `wc -l ${HARNESS_ROOT}/hooks/<hook>.sh` | `≥10` lines |
 | Manifest has entries | `grep -c '"name"' ${HARNESS_ROOT}/manifest.json` | `≥1` |
 | HARNESS_BIBLE.md Layer 0 present | `grep -c "Layer 0" ${HARNESS_ROOT}/HARNESS_BIBLE.md` | `≥1` |
-| Settings contains hooks key | `grep -c '"hooks"' ${HARNESS_ROOT}/.claude/settings.json` | `≥1` |
+| Settings contains hooks key | `grep -c '"hooks"' ${CLAUDE_HOME:-~/.claude}/settings.json` | `≥1` |
 
 **Evidence command example:**
 ```bash
@@ -84,14 +84,14 @@ Verify hooks are registered with correct event types and matchers — not just f
 
 | Item | Command | PASS Evidence |
 |------|---------|--------------|
-| Hook event types present | `grep -E '"event_type"|"matcher"' ${HARNESS_ROOT}/.claude/settings.json` | Correct event names shown |
-| Stop hook registered | `grep -c "Stop" ${HARNESS_ROOT}/.claude/settings.json` | `≥1` |
-| PreToolUse hook registered | `grep -c "PreToolUse" ${HARNESS_ROOT}/.claude/settings.json` | `≥1` |
-| Hook matchers not empty | `python3 -c "import json,sys; d=json.load(open('${HARNESS_ROOT}/.claude/settings.json'.replace('~', __import__('os').path.expanduser('~')))); hooks=d.get('hooks',{}); print(len(hooks))"` | `≥1` |
+| Hook event types present | `grep -E '"event_type"|"matcher"' ${CLAUDE_HOME:-~/.claude}/settings.json` | Correct event names shown |
+| Stop hook registered | `grep -c "Stop" ${CLAUDE_HOME:-~/.claude}/settings.json` | `≥1` |
+| PreToolUse hook registered | `grep -c "PreToolUse" ${CLAUDE_HOME:-~/.claude}/settings.json` | `≥1` |
+| Hook matchers not empty | `python3 -c "import json,sys; d=json.load(open('${CLAUDE_HOME:-~/.claude}/settings.json'.replace('~', __import__('os').path.expanduser('~')))); hooks=d.get('hooks',{}); print(len(hooks))"` | `≥1` |
 
 **Evidence command example:**
 ```bash
-grep -E '"event_type"|"matcher"|"Stop"|"PreToolUse"' ${HARNESS_ROOT}/.claude/settings.json
+grep -E '"event_type"|"matcher"|"Stop"|"PreToolUse"' ${CLAUDE_HOME:-~/.claude}/settings.json
 ```
 
 ---
