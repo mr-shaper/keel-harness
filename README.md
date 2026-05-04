@@ -212,7 +212,7 @@ power user.
 | `workflows/skill-loading-sop.md` | Skill discovery + loading SOP — prevents hallucinated tool calls |
 | `workflows/kb-ingestion-sop.md` | Knowledge base ingestion pipeline — Compound Engineering, not one-shot generation |
 
-### Hooks (8 enforce-core hooks)
+### Hooks (9 enforce-core hooks)
 
 | Hook | Type | What it enforces |
 |---|---|---|
@@ -231,7 +231,7 @@ power user.
 - `templates/cat-h-rule-template.md` — Category H canonical law template (for adding new ratified rules)
 - `templates/CLAUDE.md.global.template` — Generic global Claude Code contract (~180 LOC, scrubbed of personal config)
 - `templates/CLAUDE.md.project.template` — Generic project contract (~50 LOC, 5-must-reads + 5-self-checks + bible principles placeholder)
-- `templates/settings.json.template` — Generic settings.json with 8 enforce-core hooks registered (~80 LOC)
+- `templates/settings.json.template` — Generic settings.json with 9 hooks registered (~125 LOC, 8 enforce-core + 1 compound-selfcheck plugin hook)
 
 ### Audit Framework
 

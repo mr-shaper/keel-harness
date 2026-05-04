@@ -1,5 +1,6 @@
 {
   "version": "0.1.0",
+  "license": "Apache-2.0",
   "kernel_files": [
     "workflows/pua-topology.md",
     "workflows/oodc-superpower-harness-orchestration.md",

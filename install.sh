@@ -5,7 +5,7 @@
 #
 # Phases:
 #   Phase 0.5: Required upstream plugin check (superpowers + PUA, ABORT if missing)
-#   Phase 1:   Copy 29 kernel_files from manifest.json → HARNESS_HOME
+#   Phase 1:   Copy all kernel_files from manifest.json → HARNESS_HOME
 #   Phase 1.5: Install bundled OODC plugin (Apache-2.0) → ~/.claude/plugins/oodc/
 #   Phase 2:   CLAUDE.md merge (global prompt + project cp)
 #   Phase 3:   settings.json jq merge with atomic backup
@@ -71,7 +71,7 @@ ENVIRONMENT:
 
 PHASES:
   Phase 0.5: Required upstream plugin check (superpowers + PUA, ABORT if missing)
-  Phase 1:   Copy 29 kernel files from manifest.json → HARNESS_HOME
+  Phase 1:   Copy all kernel files from manifest.json → HARNESS_HOME
   Phase 1.5: Install bundled OODC plugin → ~/.claude/plugins/oodc/
   Phase 2:   CLAUDE.md merge (global prompt + project template cp)
   Phase 3:   settings.json jq merge with atomic backup + dry-run diff
@@ -542,7 +542,7 @@ phase5_health_check() {
   local fail=0
 
   if [[ "$DRY_RUN" == "1" ]]; then
-    dry "verify 23 kernel files present in ${HARNESS_HOME}"
+    dry "verify all kernel files present in ${HARNESS_HOME}"
     dry "verify ${CLAUDE_HOME}/settings.json contains harness hooks"
     dry "verify ${CLAUDE_HOME}/CLAUDE.md contains §harness mode section"
     success "Phase 5 (dry-run): health check skipped"

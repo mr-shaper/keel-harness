@@ -85,12 +85,14 @@ test_phase1_cp() {
     fail "test_phase1_cp (sync.sh)" "Expected ${harness_home}/sync.sh — manifest.kernel_files must include sync.sh"
   fi
 
-  # W6.5 update: manifest now 100% complete (29/29 kernel files real).
-  # Invert the old vaporware-era assertion — no source files should be missing.
+  # Manifest must be 100% complete — no source files should be missing.
+  # (Invert the old vaporware-era assertion: any "missing" warning is a failure.)
+  local kf_count
+  kf_count=$(jq '.kernel_files | length' "${REPO_ROOT}/manifest.json")
   if echo "$output" | grep -q "Source file not found\|skipping"; then
     fail "test_phase1_cp (no-missing)" "Unexpected WARN about missing source files — manifest must be 100% complete"
   else
-    pass "test_phase1_cp (manifest 29/29 complete, 0 WARN)"
+    pass "test_phase1_cp (manifest ${kf_count}/${kf_count} complete, 0 WARN)"
   fi
 
   cleanup "$ws"

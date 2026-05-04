@@ -1,5 +1,9 @@
 {
   "name": "compound-selfcheck",
   "version": "0.1.0",
-  "description": "Auto-remind to ingest large changes into knowledge base for Compound Engineering"
+  "description": "PostToolUse soft-prompt: when a Write/Edit/MultiEdit/NotebookEdit produces > 100 LOC or > 5KB, emits a stderr reminder to ingest the change into a knowledge base (Compound Engineering, not one-shot). Audit-logs [COMPOUND-CHECK] entries to .harness/hook-trace.log for real-trigger vs performance distinction. Soft-prompt only — never blocks.",
+  "author": {
+    "url": "https://github.com/mr-shaper/keel-harness"
+  },
+  "license": "Apache-2.0"
 }

@@ -8,9 +8,9 @@
 
 ## §1 圣经第一律 (cross-sprint permanent)
 
-**Single source of truth deployment**: keel-harness ships from `~/dev/harness-engineering/` (local working tree, mirrored to `github.com/mr-shaper/keel-harness`). Zero entity changes in `~/.claude/` global config from this project's development. The OSS repo is the artifact; the local dev environment is the workshop.
+**Single source of truth deployment**: keel-harness ships from `${HARNESS_ROOT:-<your-keel-harness-clone>}/` (local working tree, mirrored to `github.com/mr-shaper/keel-harness`). Zero entity changes in `~/.claude/` global config from this project's development. The OSS repo is the artifact; the local dev environment is the workshop.
 
-**Implication**: when this project's dev session modifies files, those modifications stay scoped to `~/dev/harness-engineering/`. Edits to `~/.claude/` configuration belong to a different session/scope.
+**Implication**: when this project's dev session modifies files, those modifications stay scoped to `${HARNESS_ROOT:-<your-keel-harness-clone>}/`. Edits to `~/.claude/` configuration belong to a different session/scope.
 
 ---
 
@@ -59,8 +59,8 @@ When AI is in this session's harness mode (`.harness/state` present in cwd):
 1. `.harness/handoff-S<N-1>-to-S<N>.md` (latest, authoritative next_action)
 2. `<your-plan-file-path>` (the ratified plan for the current sprint, e.g., `docs/plans/SPRINT_NAME.md`)
 3. `~/.claude/CLAUDE.md` (PUA 10 iron rules + workflow preferences)
-4. `~/dev/harness-engineering/CLAUDE.md` (project contract + roadmap)
-5. **THIS FILE** `~/dev/harness-engineering/HARNESS_BIBLE.md` (project bible)
+4. `${HARNESS_ROOT:-<your-keel-harness-clone>}/CLAUDE.md` (project contract + roadmap)
+5. **THIS FILE** `${HARNESS_ROOT:-<your-keel-harness-clone>}/HARNESS_BIBLE.md` (project bible)
 
 ### 5 self-checks (Stop hook scans AI text reply):
 - Q1 project: `keel-harness` (was `harness-engineering`, W6 renamed)
