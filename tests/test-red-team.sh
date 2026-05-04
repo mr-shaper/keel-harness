@@ -192,9 +192,12 @@ FOUND_EMAILS=""
 while IFS= read -r email; do
   [[ -z "${email}" ]] && continue
   FOUND_EMAILS="${FOUND_EMAILS} [${email}]"
-  if [[ "${email}" != "mrshaper@users.noreply.github.com" ]]; then
-    BAD_EMAILS=$(( BAD_EMAILS + 1 ))
-  fi
+  # Whitelist: maintainer noreply + any GitHub bot noreply
+  # (dependabot, github-actions, etc. use NUMERIC+name[bot]@users.noreply.github.com)
+  case "${email}" in
+    mrshaper@users.noreply.github.com|*\[bot\]@users.noreply.github.com) ;;
+    *) BAD_EMAILS=$(( BAD_EMAILS + 1 )) ;;
+  esac
 done <<< "${EMAILS}"
 if [[ "${BAD_EMAILS}" -eq 0 ]]; then
   pass "test_git_author_email (all commits use mrshaper@users.noreply.github.com)"
