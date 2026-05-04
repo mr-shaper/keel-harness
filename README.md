@@ -1,20 +1,26 @@
 # keel-harness
 
-**🇺🇸 English** · [🇨🇳 中文](README.zh-CN.md)
+**24-hour Claude Code sessions that don't drift, forget, or fake-pass tests.**
 
-> Harness for Claude Code: 24h cross-session continuity + canonical honesty enforcement + P10-9-8-7 nested parallel agent topology — Karpathy's agentic engineering, made enforceable.
-
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml/badge.svg)](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml)
 [![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](https://github.com/mr-shaper/keel-harness/releases)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+· **🇺🇸 English** · [🇨🇳 中文](README.zh-CN.md)
 
-![5 vocab + 4 gaps demo](demo/demo-4.gif)
+[Quickstart](#quickstart-5-min) · [What's Inside](#whats-inside-kernel-scope) · [Architecture](#architecture-4-layer-nested-parallel-topology) · [Docs](#documentation)
 
-> *90 seconds to grok harness. The 4 gaps it fills + the 5 words we want in the agentic engineering vocabulary. Reproduce with `bash demo/record.sh 4`.*
+![keel-harness 90s walkthrough — the 4 gaps it fills, the 5 words it adds](demo/demo-4.gif)
 
-![Phase 0-4 Pipeline + Wave Structure](docs/visuals/pipeline-whiteboard.png)
+> **Without keel:** new session, blank slate. The agent forgets last sprint, re-decides settled questions, commits a stray API key, and tells you the tests pass without running them.
+>
+> **With keel:** new session, same momentum. 9 hooks fire on every tool call. A 7-field handoff carries context across the restart. Secrets get blocked at commit time. *"Done"* requires the command output to prove it.
 
-> *How a single sprint moves through 5 phases × parallel waves, with multi-agent dispatch at every layer.*
+```bash
+# After installing superpowers + PUA (see Required Dependencies below):
+git clone https://github.com/mr-shaper/keel-harness && cd keel-harness && bash install.sh
+```
+
+A hook framework + handoff schema + audit gate. Apache-2.0. macOS + Linux. Built on top of [superpowers](https://github.com/obra/superpowers) and [PUA](https://github.com/tanweai/pua).
 
 ---
 

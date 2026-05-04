@@ -1,16 +1,26 @@
 # keel-harness
 
-[🇺🇸 English](README.md) · **🇨🇳 中文**
+**让你的 Claude Code 24 小时长 session 不漂、不失忆、不在测试上撒谎。**
 
-> Claude Code 的工程脚手架：24 小时跨 session 接续 + canonical 诚实律 + P10-9-8-7 嵌套并行 agent 拓扑 —— 把 Karpathy 的 agentic engineering 变成可强制 enforce 的协议。
-
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/mr-shaper/keel-harness/actions)
+[![CI](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml/badge.svg)](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml)
 [![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](https://github.com/mr-shaper/keel-harness/releases)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+· [🇺🇸 English](README.md) · **🇨🇳 中文**
 
-![5 vocab + 4 gaps demo](demo/demo-4.gif)
+[5 分钟 Quickstart](#5-分钟-quickstart) · [4 层拓扑](#4-层嵌套并行拓扑) · [License](#license)
 
-> *90 秒看懂 keel-harness。它填补的 4 个缝隙 + 我们想推进 agentic engineering 词汇库的 5 个词。本地复现：`bash demo/record.sh 4`*
+![keel-harness 90 秒走查 —— 它填补的 4 个缝隙 + 推进社区的 5 个词](demo/demo-4.gif)
+
+> **没装 keel：** 新 session、空白脑子。agent 忘了上 sprint 决策, 把已定的方案重新议一遍, 顺手把一段 API key 提交进 git, 然后告诉你"测试全过了" —— 你跑一遍, 6 个失败.
+>
+> **装了 keel：** 新 session、同一节奏。9 个 hook 在每次 tool call 上 fire, 7 字段 handoff 把上下文跨 session 接下来, secret 在 commit 时被拦, *"做完了"* 必须配 output evidence.
+
+```bash
+# 先装 superpowers + PUA 上游依赖 (见下面 必装上游依赖 段)，然后:
+git clone https://github.com/mr-shaper/keel-harness && cd keel-harness && bash install.sh
+```
+
+一个 hook 框架 + handoff schema + audit gate. Apache-2.0, macOS + Linux. 基于 [superpowers](https://github.com/obra/superpowers) 和 [PUA](https://github.com/tanweai/pua).
 
 ---
 
