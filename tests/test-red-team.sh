@@ -8,7 +8,7 @@ set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SYNC="${REPO_ROOT}/sync.sh"
-HOOK_SRC="${REPO_ROOT}/.git/hooks/pre-commit"
+HOOK_SRC="${REPO_ROOT}/hooks/pre-commit"
 MANIFEST_SRC="${REPO_ROOT}/manifest.json"
 FIXTURE_DIR="${REPO_ROOT}/tests/red-team"
 
