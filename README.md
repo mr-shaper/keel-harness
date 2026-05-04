@@ -9,7 +9,7 @@
 
 [Quickstart](#quickstart-5-min) · [What's Inside](#whats-inside-kernel-scope) · [Architecture](#architecture-4-layer-nested-parallel-topology) · [Docs](#documentation)
 
-![keel-harness 90s walkthrough — the 4 gaps it fills, the 5 words it adds](demo/demo-4.gif)
+![Same fresh Claude Code session, with vs without keel — Act 1 Without (lost context, leaked secret, fake test pass) → Act 2 With (handoff carried, secret blocked, claim verified)](demo/demo-5.gif)
 
 > **Without keel:** new session, blank slate. The agent forgets last sprint, re-decides settled questions, commits a stray API key, and tells you the tests pass without running them.
 >
@@ -26,10 +26,14 @@ A hook framework + handoff schema + audit gate. Apache-2.0. macOS + Linux. Built
 
 ## 30-Second Elevator Pitch
 
-Stop your AI from getting dumber over a 24h session. harness-engineering is the infrastructure
-layer that makes Karpathy's agentic engineering enforceable in Claude Code — through immutable
-handoffs, Romeo 6-dim audit, canonical honesty hooks, and P10-9-8-7 nested parallel agent
-topology. Apache-2.0. macOS + Linux.
+Long Claude Code sessions decay. The agent forgets last sprint's decisions,
+re-debates settled questions, leaks the occasional secret into commits, and
+claims tests pass without running them. **keel-harness is the infrastructure
+underneath** — a 7-field handoff schema that survives session restart, 9 hooks
+that fire on every tool call, a 6-dimension audit gate, and a 4-layer agent
+topology that keeps the tech-lead AI from quietly slipping into IC mode. Same
+model, same prompts — bounded by hooks, anchored to evidence. Apache-2.0,
+macOS + Linux.
 
 ---
 

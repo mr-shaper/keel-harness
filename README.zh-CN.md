@@ -9,7 +9,7 @@
 
 [5 分钟 Quickstart](#5-分钟-quickstart) · [4 层拓扑](#4-层嵌套并行拓扑) · [License](#license)
 
-![keel-harness 90 秒走查 —— 它填补的 4 个缝隙 + 推进社区的 5 个词](demo/demo-4.gif)
+![同一个 fresh Claude Code session, 装 vs 没装 keel —— Act 1 没装 (丢上下文 / 泄密钥 / 假测试通过) → Act 2 装了 (handoff 接续 / secret 被拦 / claim 必须 verify)](demo/demo-5.gif)
 
 > **没装 keel：** 新 session、空白脑子。agent 忘了上 sprint 决策, 把已定的方案重新议一遍, 顺手把一段 API key 提交进 git, 然后告诉你"测试全过了" —— 你跑一遍, 6 个失败.
 >

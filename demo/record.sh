@@ -52,30 +52,33 @@ record_one() {
 }
 
 case "${1:-help}" in
+  5)   record_one 5 "before-after" ;;
   4)   record_one 4 "vocab-gaps" ;;
   1)   record_one 1 "cross-session" ;;
   2)   record_one 2 "parallel" ;;
   3)   record_one 3 "honesty" ;;
   all)
+    record_one 5 "before-after"
     record_one 4 "vocab-gaps"
     record_one 1 "cross-session"
     record_one 2 "parallel"
     record_one 3 "honesty"
     echo ""
-    echo "═══ All 4 demos recorded ═══"
+    echo "═══ All 5 demos recorded ═══"
     ls -lh demo/*.gif
     ;;
   *)
     cat <<'EOF'
 Usage:
-  bash demo/record.sh 4      # BONUS demo (1.5 min, 5 vocab + 4 gaps) — recommended first
+  bash demo/record.sh 5      # HERO demo (~75s, Before/After contrast) — recommended for README hero
+  bash demo/record.sh 4      # BONUS demo (1.5 min, 5 vocab + 4 gaps)
   bash demo/record.sh 1      # 24h cross-session continuity (3 min)
   bash demo/record.sh 2      # 4-layer nested parallel (2 min)
   bash demo/record.sh 3      # canonical honesty hooks (2.5 min)
-  bash demo/record.sh all    # record all 4 sequentially
+  bash demo/record.sh all    # record all 5 sequentially
 
 After recording, embed in README.md:
-  ![demo 4](demo/demo-4.gif)
+  ![demo 5](demo/demo-5.gif)
 EOF
     ;;
 esac
