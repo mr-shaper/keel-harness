@@ -51,7 +51,7 @@ echo ""
 echo "## Step 4: 5 self-checks (Stop hook scans AI text reply, must contain Q1-Q5)"
 sleep 0.5
 echo "→ AI replies with Q1-Q5 answers, must-ack-done.flag is written"
-echo "  Q1 project=harness-engineering / Q2 next_action=W2 Day 1 / Q3 clarity=high"
+echo "  Q1 project=keel-harness / Q2 next_action=W2 Day 1 / Q3 clarity=high"
 echo "  Q4 LATEST_HANDOFF=handoff-S2-to-S3.md / Q5 phase=W2 Day 1 startup"
 sleep 1
 

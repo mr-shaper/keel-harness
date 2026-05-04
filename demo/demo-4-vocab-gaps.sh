@@ -23,7 +23,7 @@ type_cmd() {
 clear
 cat <<'BANNER'
 ═══════════════════════════════════════════════════════════════
-  harness-engineering — 5 words to enter the agentic eng vocab
+  keel-harness — 5 words to enter the agentic eng vocab
 ═══════════════════════════════════════════════════════════════
 BANNER
 sleep 1.5
