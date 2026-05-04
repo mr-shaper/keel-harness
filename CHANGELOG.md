@@ -27,8 +27,8 @@ Four enhancements that strengthen the universal kernel without exposing private 
 - **`scripts/sync-self-check.sh`** — Cross-platform 5-layer evidence dump script.
   Maintainer runs it after sprint, reads the dumped evidence, and self-evaluates
   sprint outcome. The script never decides outcome itself (P9-doesn't-decide-L4
-  pattern). Supports `--dry-run`, uses `$(hostname)` dynamic, `git rev-parse`
-  fallback for `HARNESS_ROOT`.
+  pattern). Read-only by design — no flags, no side effects, always exits 0.
+  Uses `$(hostname)` dynamic, `git rev-parse` fallback for `HARNESS_ROOT`.
 
 - **`docs/visuals/`** — Three rendered visual versions of harness core
   concepts, each in a different ljg-card aesthetic mode (English-only, OSS
@@ -47,31 +47,65 @@ Four enhancements that strengthen the universal kernel without exposing private 
 
 ### Changed
 
-- **`hooks/pre-tool-handoff-read-gate.sh`** — `resolve_harness_root()` three-path
-  fallback ratified (was already in S2 W6.7, formalized as kernel pattern). Now
-  resolves harness root via cwd → `$HARNESS_ROOT` env override → silent OK,
-  preventing "cwd has no `.harness/` → hook silent skip → P9 self-check missing"
+- **`hooks/pre-tool-handoff-read-gate.sh`** — Introduces a new
+  `resolve_harness_root()` function that replaces the previous flat
+  `git rev-parse || pwd` fallback. Three explicit priorities:
+  (1) git repo root containing `.harness/`,
+  (2) `$HARNESS_ROOT` environment variable when set and pointing to a
+  `.harness/` directory,
+  (3) silent OK exit when neither resolves — preventing the
+  "cwd has no `.harness/` → hook silent skip → P9 self-check missing"
   cross-context failure mode.
 
 - **`templates/settings.json.template`** — `PostToolUse` array gains the
   compound-selfcheck wire (matcher `Write|Edit|MultiEdit|NotebookEdit`,
   timeout 10).
 
-- **`manifest.json`** — `kernel_files` adds two new entries
-  (`docs/sprint-kickoff-checklist.md`, `scripts/sync-self-check.sh`).
-  `private_blacklist_keywords` adds seven scope-forbidden terms
-  (`CLAUDE_CONFIG_DIR`, `Mobile Documents`, `Mrs-Mac-mini`, `Mrs-MacBook-Pro`,
-  `claude-codepilot`, `codepilot`, `dual-runtime`) to prevent private terminology
-  leakage in future commits.
+- **`hooks/pre-commit`** — `SKIP_PATHS` refined: the previous blanket
+  `"docs/"` exemption is replaced with two explicit per-file exemptions
+  (`docs/license-audit-report.md`, `docs/manifest-customization-guide.md`).
+  This forces `docs/visuals/` and `docs/sprint-kickoff-checklist.md` to
+  pass the strict PII gate. `README.zh-CN.md` and `CHANGELOG.md` added
+  to the exemption list (bilingual sibling and retrospective release notes
+  legitimately reference brand-sweep terms).
+
+- **`manifest.json`** — `kernel_files` adds seven new entries
+  (`README.zh-CN.md`, `CHANGELOG.md` newly registered;
+  `plugins/compound-selfcheck-plugin/{plugin.json,hook.sh,README.md}`;
+  `docs/sprint-kickoff-checklist.md`; `scripts/sync-self-check.sh`).
+  `private_blacklist_keywords` adds eight scope-forbidden terms
+  (`CLAUDE_CONFIG_DIR`, `Maintainer`, `Mobile Documents`, `Mrs-Mac-mini`,
+  `Mrs-MacBook-Pro`, `claude-codepilot`, `codepilot`, `dual-runtime`)
+  to prevent private terminology leakage in future commits.
 
 ### Notes
 
 - The `manifest.json` `private_blacklist_keywords` field is the **scanner
-  definition itself** — by necessity it contains the literal forbidden strings.
-  Pre-commit hooks must exclude `manifest.json` from blacklist scans
-  (meta-paradox: the gate must reference what it forbids).
+  definition itself** — by necessity it contains the literal forbidden
+  strings. Pre-commit hooks must exclude `manifest.json` from blacklist
+  scans (meta-paradox: the gate must reference what it forbids).
 - This sprint introduces no new `Category H` rules; all changes are kernel
   refinements within the existing `v1.13` ratified scope.
+
+### Candidates (forward-looking notes for future sprints)
+
+- **[CANDIDATE] Per-subdirectory pre-commit `SKIP_PATHS`**: The W6 era
+  used a `"docs/"` blanket exemption that allowed a brand-sweep regression
+  to enter `docs/visuals/` (caught only by Romeo audit). The fix in this
+  sprint moved to per-file exemptions — but a more principled approach
+  would be hierarchical: an exempted directory should require an explicit
+  un-exempt list for higher-risk subdirectories (e.g., `docs/` exempt by
+  default, `docs/visuals/` always strict, `docs/license-*.md` exempt).
+- **[CANDIDATE] `resolve_harness_root()` Priority 1.5 — cwd `.harness/`
+  without git**: The current Priority 1 is `git rev-parse --show-toplevel`,
+  so a directory containing `.harness/` but not initialized as a git repo
+  will silently skip. Useful for non-git harness experiments (rare but
+  worth a Priority 1.5 check on `$PWD/.harness/` directly).
+- **[CANDIDATE] Romeo audit as pre-push hook**: This sprint's
+  `pre-tool-plan-quality-gate.sh` enforces Romeo ≥0.99 on plan files.
+  Extending the same gate to `pre-push` would catch sprint-outcome
+  regressions before they hit the remote (caught here only by manual
+  audit dispatch).
 
 ---
 

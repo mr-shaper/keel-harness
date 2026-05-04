@@ -31,7 +31,9 @@ SKIP_PATHS=(
   "tests/red-team/"         # red-team fixtures: mock PII attack vectors (by design, prefix match)
   "demo/"                   # asciinema cast files contain mock PII for honesty demos (by design, prefix match)
   "templates/"              # OSS template files: contain hook names with substring false positives
-  "docs/"                   # internal audit/design docs: may contain notes with private terms
+  "docs/license-audit-report.md"        # legal audit cites third-party brand names (limited exemption)
+  "docs/manifest-customization-guide.md" # documents the blacklist itself — must contain example terms
+  # NOTE: docs/visuals/ and docs/sprint-kickoff-checklist.md NOT exempted — must pass strict PII gate
 )
 
 # ── CONTEXT_FILTERS: line-level exemptions (regex → skip that line) ──────────

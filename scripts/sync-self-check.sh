@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # sync-self-check.sh — OSS 5-dimension evidence dump for maintainer evaluation
 # Does NOT modify any files. Exit 0 always (evidence dump, not a gate).
-# Usage: bash sync-self-check.sh [--dry-run]
+# Usage: bash sync-self-check.sh
 
 set -uo pipefail
 
@@ -20,14 +20,11 @@ kv() {
 }
 
 # ---------------------------------------------------------------------------
-# Args
+# Mode
 # ---------------------------------------------------------------------------
-DRY_RUN=0
-for arg in "$@"; do
-  case "$arg" in
-    --dry-run) DRY_RUN=1 ;;
-  esac
-done
+# This script is read-only by design: it dumps evidence and exits 0.
+# It never writes, modifies, or deletes any file. No flags are needed —
+# the script's contract is "evidence in, no side effects."
 
 # ---------------------------------------------------------------------------
 # Path resolution
@@ -38,7 +35,7 @@ HARNESS_ROOT="${HARNESS_ROOT:-$(git -C "$(dirname "$0")" rev-parse --show-toplev
 echo "sync-self-check.sh — OSS evidence dump"
 kv "host"        "${HOST}"
 kv "harness_root" "${HARNESS_ROOT}"
-kv "dry_run"     "${DRY_RUN}"
+kv "mode"        "read-only"
 kv "date"        "$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
 # ---------------------------------------------------------------------------
@@ -185,7 +182,7 @@ fi
 # Footer
 # ---------------------------------------------------------------------------
 header "Summary"
-kv "dry_run"  "${DRY_RUN}"
+kv "mode"     "read-only"
 kv "modified" "0 files (evidence dump only)"
 echo ""
 echo "  Maintainer: review Layers A-E above, then self-evaluate sprint outcome."
