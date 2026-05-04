@@ -336,18 +336,6 @@ includes a patent grant — appropriate for infrastructure frameworks. See LICEN
 
 ---
 
-## Status Badges (W5 CI)
-
-The following badges will be populated when GitHub Actions CI ships in W5:
-
-```
-[![CI](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml/badge.svg)]
-[![Coverage](https://img.shields.io/badge/coverage-TBD-lightgrey)]
-[![Version](https://img.shields.io/github/v/tag/mr-shaper/keel-harness)]
-```
-
----
-
 ## Contributing
 
 Issues and PRs welcome. Before opening a PR:
