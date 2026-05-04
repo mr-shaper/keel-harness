@@ -65,9 +65,9 @@ echo "=== pre-commit TDD 7-case suite ==="
 echo ""
 
 # ── Case 1: blacklist keyword blocks commit ───────────────────────────────────
-echo "[1/7] test_blacklist_block: stage file containing 'mrshaper'"
+echo "[1/7] test_blacklist_block: stage file containing 'mr-shaper'"
 REPO1="$(make_repo 1)"
-echo "username: mrshaper" > "${REPO1}/dirty.txt"
+echo "username: mr-shaper" > "${REPO1}/dirty.txt"
 git -C "${REPO1}" add dirty.txt manifest.json 2>/dev/null
 RESULT="$(run_hook "${REPO1}" 2>/dev/null)"
 run_test "test_blacklist_block" "${RESULT}" 1
@@ -83,7 +83,7 @@ run_test "test_clean_pass" "${RESULT}" 0
 # ── Case 3: wrong author email blocks commit ──────────────────────────────────
 echo "[3/7] test_author_email_check: wrong email -> abort, then revert"
 REPO3="$(make_repo 3)"
-git -C "${REPO3}" config user.email "oss-test-author@example.test"
+git -C "${REPO3}" config user.email "mrshaper@example.test"
 echo "clean content only" > "${REPO3}/file.txt"
 git -C "${REPO3}" add file.txt manifest.json 2>/dev/null
 RESULT="$(run_hook "${REPO3}" 2>/dev/null)"
@@ -103,7 +103,7 @@ run_test "test_sk_ant_block" "${RESULT}" 1
 echo "[5/7] test_manifest_skip: stage manifest.json (contains keyword literals) -> SKIP not BLOCK"
 REPO5="$(make_repo 5)"
 # manifest.json is already copied; re-stage it alone (no other files)
-# It contains 'mrshaper', 'maintainer', etc. as keyword definitions
+# It contains 'mr-shaper', 'mrshaper', etc. as keyword definitions
 git -C "${REPO5}" add manifest.json 2>/dev/null
 HOOK_OUT5="${TMPDIR_BASE}/hook_out5.txt"
 RESULT="$(run_hook_capturing "${REPO5}" "${HOOK_OUT5}")"
@@ -142,7 +142,7 @@ run_test "test_github_url_context_filter" "${RESULT}" 0
 # ── Case 7: BLOCK message includes hit keyword name ──────────────────────────
 echo "[7/7] test_diagnostic_output: BLOCK message shows which keyword matched"
 REPO7="$(make_repo 7)"
-echo "config: oss-test-user@example.com" > "${REPO7}/leaky.txt"
+echo "config: mrshaper@example.com" > "${REPO7}/leaky.txt"
 git -C "${REPO7}" add leaky.txt manifest.json 2>/dev/null
 HOOK_OUT7="${TMPDIR_BASE}/hook_out7.txt"
 RESULT="$(run_hook_capturing "${REPO7}" "${HOOK_OUT7}")"

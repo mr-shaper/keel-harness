@@ -16,8 +16,8 @@ TEST_MODE="${HARNESS_TEST_MODE:-0}"       # set to 1 to auto-Y prompts
 
 # ── Layer 2 blacklist patterns ────────────────────────────────────────────────
 BLACKLIST_PATTERNS=(
+  'mr-shaper'
   'mrshaper'
-  'oss-test-user'
   'sk-ant-[a-zA-Z0-9_-]*'
   '/Users/[^/]*/\.claude/'
 )
@@ -28,8 +28,8 @@ apply_sed_sanitize() {
   # SC2016: $HOME intentionally literal in sed replacement (not expanded)
   # shellcheck disable=SC2016
   sed -i.bak \
-    -e 's|/Users/mrshaper/|$HOME/|g' \
-    -e 's|mrshaper|<USER>|g' \
+    -e 's|/Users/mr-shaper/|$HOME/|g' \
+    -e 's|mr-shaper|<USER>|g' \
     -e 's|sk-ant-[a-zA-Z0-9_-]*|<REDACTED-API-KEY>|g' \
     "$file"
   rm -f "${file}.bak"
@@ -149,7 +149,7 @@ cmd_export() {
     fi
 
     # Stage first, then apply Layer 3 sed sanitize, then Layer 2 blacklist check
-    # Order rationale: sed removes known PII patterns (e.g. /Users/mrshaper/ → $HOME/).
+    # Order rationale: sed removes known PII patterns (e.g. /Users/mr-shaper/ → $HOME/).
     # Anti-pattern documentation that contains PII as examples gets sanitized first.
     # Layer 2 grep runs on the sanitized copy — any hit after sed = true leak (sed missed it).
     local dest_dir
@@ -296,11 +296,11 @@ cmd_release() {
     echo "      To install: brew install gitleaks" >&2
   fi
 
-  # Gate 2: verify all commits use public email (not maintainer's personal oss-test-user*)
+  # Gate 2: verify all commits use public email (not the maintainer's personal email pattern)
   info "Verifying author emails in git log..."
   local bad_emails
   bad_emails=$(git log --format="%ae" 2>/dev/null \
-    | grep -E 'oss-test-user|mrshaper' || true)
+    | grep -E 'mrshaper|mr-shaper' || true)
   if [[ -n "$bad_emails" ]]; then
     echo "ABORT: private email(s) found in git history:" >&2
     echo "$bad_emails" >&2

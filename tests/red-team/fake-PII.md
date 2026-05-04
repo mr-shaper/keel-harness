@@ -5,31 +5,31 @@
 
 ## Simulated Private Username Leak
 
-author: maintainer
-github_user: mrshaper
-alias: "OSS_MAINTAINER"
+author: mrshaper
+github_user: mr-shaper
+alias: "Mr Shaper"
 
 ## Simulated Email Leak
 
-contact: oss-test-author@example.test
-alternate: oss-test-user@example.test
+contact: mrshaper@example.test
+alternate: mrshaper@example.test
 
 ## Simulated Private Path Leak
 
-home_dir: /Users/mrshaper/Library/Mobile Documents/com~apple~CloudDocs/AI/Claude/
-config_path: /Users/mrshaper/.claude/settings.json
-cache: /Users/mrshaper/.cache/harness
+home_dir: /Users/mr-shaper/Library/Mobile Documents/com~apple~CloudDocs/AI/Claude/
+config_path: /Users/mr-shaper/.claude/settings.json
+cache: /Users/mr-shaper/.cache/harness
 
 ## Simulated Enterprise/Corp Keyword Leak
 
-employer: example-employer
-network: example-employer
+employer: examplecorp
+network: 示例公司物流
 crm: feishu
 messaging: dingtalk
 
 ## Simulated Identity Mapping
 
-real_name: Mr Shaper Zhu
-internal_alias: mrshaper
-team: example-employer-US-KA
-project: example-employer Last-Mile Solutions
+real_name: Mr Shaper
+internal_alias: mr-shaper
+team: examplecorp
+project: 示例公司 Last-Mile Solutions

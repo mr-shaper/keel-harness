@@ -25,5 +25,5 @@ API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fakepayload.fakesig
 
 ## Simulated Account ID + Credential Combo Leak (sync.sh Layer 2 target)
 
-# Account credential for oss-test-user (private UID — must not leave ~/.claude)
-account_uid: oss-test-user
+# Account credential for mrshaper (private UID — must not leave ~/.claude)
+account_uid: mrshaper

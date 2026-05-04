@@ -88,9 +88,9 @@ test_export_blacklist_block() {
   # Use an API key pattern that Layer 3 sed does NOT sanitize (true leak after sanitize).
   # sk-ant-XYZ matches blacklist pattern 'sk-ant-[a-zA-Z0-9_-]*' and sed rule only replaces
   # 'sk-ant-[a-zA-Z0-9_-]*' → '<REDACTED-API-KEY>'. BUT the sed rule DOES handle it.
-  # So we use 'oss-test-user' which is a blacklist pattern with no sed substitution rule —
+  # So we use 'mrshaper' which is a blacklist pattern with no sed substitution rule —
   # sed cannot sanitize it → after sed, grep still hits → true leak → ABORT.
-  echo "contact: oss-test-user@example.com" > "${fake_claude}/secret.md"
+  echo "contact: mrshaper@example.com" > "${fake_claude}/secret.md"
 
   # Create sub-repo with sync.sh
   local sub; sub="$(new_workspace)"
@@ -127,18 +127,18 @@ EOF
 
 # ── Case 2b: test_export_antipattern_doc_passes ───────────────────────────────
 test_export_antipattern_doc_passes() {
-  echo "[2b] test_export_antipattern_doc_passes: anti-pattern doc with /Users/mrshaper/ exports after sed sanitize"
+  echo "[2b] test_export_antipattern_doc_passes: anti-pattern doc with /Users/mr-shaper/ exports after sed sanitize"
   local ws; ws="$(new_workspace)"
   local fake_claude="${ws}/dot_claude"
   mkdir -p "${fake_claude}"
 
   # Simulate anti-pattern documentation (e.g. kb-ingestion-sop.md §10):
-  # contains /Users/mrshaper/ as a documentation example (not real PII usage).
-  # Layer 3 sed replaces /Users/mrshaper/ → $HOME/
+  # contains /Users/mr-shaper/ as a documentation example (not real PII usage).
+  # Layer 3 sed replaces /Users/mr-shaper/ → $HOME/
   # Layer 2 grep on sanitized copy should NOT hit → export PASS.
   cat > "${fake_claude}/antipattern-doc.md" <<'DOCEOF'
 # Anti-pattern example
-# BAD: /Users/mrshaper/Library/Mobile Documents/foo/bar.md
+# BAD: /Users/mr-shaper/Library/Mobile Documents/foo/bar.md
 # GOOD: use $HOME/Library/... instead
 DOCEOF
 
@@ -170,13 +170,13 @@ EOF
     fail "anti-pattern doc NOT found in repo after export" "output: ${output}"
   fi
 
-  # Exported content must NOT contain /Users/mrshaper/
+  # Exported content must NOT contain /Users/mr-shaper/
   if [[ -f "${sub}/antipattern-doc.md" ]]; then
     local content; content="$(cat "${sub}/antipattern-doc.md")"
-    if echo "$content" | grep -q '/Users/mrshaper/'; then
-      fail "anti-pattern doc still contains /Users/mrshaper/ after sed" "content: ${content}"
+    if echo "$content" | grep -q '/Users/mr-shaper/'; then
+      fail "anti-pattern doc still contains /Users/mr-shaper/ after sed" "content: ${content}"
     else
-      pass "anti-pattern doc: /Users/mrshaper/ replaced by sed in exported file"
+      pass "anti-pattern doc: /Users/mr-shaper/ replaced by sed in exported file"
     fi
   fi
 
@@ -186,13 +186,13 @@ EOF
 
 # ── Case 3: test_export_sed_sanitize ─────────────────────────────────────────
 test_export_sed_sanitize() {
-  echo "[3] test_export_sed_sanitize: /Users/mrshaper/ replaced with \$HOME/"
+  echo "[3] test_export_sed_sanitize: /Users/mr-shaper/ replaced with \$HOME/"
   local ws; ws="$(new_workspace)"
   local fake_claude="${ws}/dot_claude"
   mkdir -p "${fake_claude}"
 
   # Use HARNESS_SKIP_BLACKLIST=1 to isolate sed sanitize behavior from blacklist gate
-  echo "export_path=/Users/mrshaper/test/thing.sh" > "${fake_claude}/config.md"
+  echo "export_path=/Users/mr-shaper/test/thing.sh" > "${fake_claude}/config.md"
 
   local sub; sub="$(new_workspace)"
   cp "$SYNC" "${sub}/sync.sh"
@@ -209,10 +209,10 @@ EOF
 
   if [[ -f "${sub}/config.md" ]]; then
     local content; content="$(cat "${sub}/config.md")"
-    if echo "$content" | grep -q '/Users/mrshaper/'; then
-      fail "sed sanitize: /Users/mrshaper/ still present after export" "content: ${content}"
+    if echo "$content" | grep -q '/Users/mr-shaper/'; then
+      fail "sed sanitize: /Users/mr-shaper/ still present after export" "content: ${content}"
     else
-      pass "sed sanitize: /Users/mrshaper/ replaced in exported file"
+      pass "sed sanitize: /Users/mr-shaper/ replaced in exported file"
     fi
     if echo "$content" | grep -q '\$HOME/'; then
       pass "sed sanitize: \$HOME/ present in exported file"
@@ -339,7 +339,7 @@ EOF
   # Init a real git repo with a commit using private email
   pushd "$sub" > /dev/null
   git init -q
-  git config user.email "oss-test-user@example.test"
+  git config user.email "mrshaper@example.test"
   git config user.name "Test User"
   echo "test" > placeholder.txt
   git add placeholder.txt
@@ -351,7 +351,7 @@ EOF
     HARNESS_DRY_RELEASE=1 \
     bash "${sub}/sync.sh" release v0.1.0 2>&1 || true)
 
-  # Must abort because git log contains "oss-test-user" email
+  # Must abort because git log contains the maintainer's private email
   if echo "$output" | grep -qE "ABORT|Release gate FAILED|private email"; then
     pass "release gate: aborted on private email in git log"
   else

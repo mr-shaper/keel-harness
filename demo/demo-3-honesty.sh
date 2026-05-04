@@ -25,7 +25,7 @@ echo ""
 echo "## Setup: simulate a careless attacker staging real PII"
 sleep 0.5
 ATTACK=$(mktemp /tmp/attack-XXXXX.md)
-echo "user@example.org wrote: my account is oss-test-user" > "$ATTACK"
+echo "user@example.org wrote: my account is mrshaper" > "$ATTACK"
 echo "key: sk-ant-fakeAttackerKey_abcXYZ_123456789" >> "$ATTACK"
 type_cmd "cat $ATTACK"
 sleep 1
@@ -34,7 +34,7 @@ echo ""
 echo "## Layer 1+2: sync.sh blacklist grep + sed sanitize (export-side defense)"
 sleep 0.5
 echo "(would block on real export; demo: keyword grep already finds it)"
-type_cmd "grep -E 'oss-test-user|sk-ant' $ATTACK"
+type_cmd "grep -E 'mrshaper|sk-ant' $ATTACK"
 sleep 1
 
 echo ""
@@ -54,7 +54,7 @@ sleep 0.6
 echo "(expected: BLOCK with hit keywords)"
 sleep 0.6
 # simulate grep that pre-commit would do — visible to user
-manifest_kw="oss-test-user|sk-ant|maintainer|mrshaper@gmail.com"
+manifest_kw="mrshaper|sk-ant|mrshaper|mr-shaper@example.test"
 echo ""
 echo "→ pre-commit would scan and see:"
 grep -E "$manifest_kw" attack.md && echo ""
