@@ -58,7 +58,7 @@ REQUIRED upstream plugins (auto-detected, install BEFORE running this script):
   superpowers (MIT, by Jesse Vincent / @obra)
     claude plugin marketplace add obra/superpowers-marketplace
     claude plugin install superpowers@superpowers-marketplace
-  PUA (MIT, by 探微安全实验室 / @tanweai)
+  PUA (MIT, by TanWei Security Lab / @tanweai)
     git clone https://github.com/tanweai/pua ~/.claude/plugins/pua
 
 BUNDLED plugin (auto-installed by this script in Phase 1.5):
@@ -190,7 +190,7 @@ phase0_required_deps_check() {
         echo ""
         ;;
       pua)
-        echo -e "${YELLOW}  [MISSING] PUA (MIT, by 探微安全实验室 / @tanweai)${NC}"
+        echo -e "${YELLOW}  [MISSING] PUA (MIT, by TanWei Security Lab / @tanweai)${NC}"
         echo "    Provides: P10/P9/P8/P7 role protocols, red-line enforcement,"
         echo "              Romeo evaluator, parallel agent topology."
         echo "    Install:"

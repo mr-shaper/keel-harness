@@ -1,117 +1,117 @@
-# Orient — 多视角定位手册
+# Orient — Multi-Perspective Positioning Playbook
 
-## ��家动态路由表
+## Expert Dynamic Routing Table
 
-按 Observe 输出的域信号匹配 2-4 位大师。**硬上限：最多 4 位**。
+Match 2-4 perspective experts based on domain signals from the Observe output. **Hard cap: at most 4**.
 
-| 内容域信号 | 推荐大师 | 理由 |
-|-----------|---------|------|
-| AI/ML 产品 | karpathy + ilya + naval | 技术可靠性 + 安全 + 杠杆 |
-| 消费应用 / 增长 | mrbeast + jobs + musk | 内容 + 品味 + 成本 |
-| 金融 / 量化 | taleb + munger + naval | 风险 + 多元模型 + 杠杆 |
-| 内容创作 | naval + paul-graham + mrbeast | 杠杆 + 写作 + ��长 |
-| 基础设施 / 工具 | musk + feynman + karpathy | ��一性 + 简化 + 可靠 |
-| 方法论 / 认知 | feynman + munger + naval | 理解 + 多元 + 第一性 |
-| 教育 / 职业 | zhangxuefeng + naval + paul-graham | 实操 + 杠杆 + 洞察 |
-| 商业模式 | zhang-yiming + naval + munger | 分发 + 杠杆 + 多元 |
+| Domain signal | Recommended experts | Rationale |
+|---|---|---|
+| AI/ML product | karpathy + ilya + naval | Technical reliability + safety + leverage |
+| Consumer / growth | mrbeast + jobs + musk | Content + taste + cost |
+| Finance / quant | taleb + munger + naval | Risk + multi-model + leverage |
+| Content creation | naval + paul-graham + mrbeast | Leverage + writing + growth |
+| Infrastructure / tooling | musk + feynman + karpathy | First principles + simplification + reliability |
+| Methodology / cognition | feynman + munger + naval | Understanding + pluralism + first principles |
+| Education / career | zhangxuefeng + naval + paul-graham | Practical + leverage + insight |
+| Business model | zhang-yiming + naval + munger | Distribution + leverage + multi-model |
 
-**规则**：
-- CTO 读 Observe 摘要 → 匹配域信号 → 调用对应大师
-- 不匹配时默认：musk + naval + feynman
-- 多域交叉时：每域 top 1，上限 4 位
-- 调用方式：`Skill("{perspective-name}")` — 指示"只用心智模型和决策启发式分析，跳过角色扮演和表达DNA"
+**Rules**:
+- Read the Observe summary → match domain signals → invoke the corresponding experts
+- Default when no match: musk + naval + feynman
+- Multi-domain crossover: top 1 per domain, cap at 4
+- Invocation: `Skill("{perspective-name}")` — instruction: "use only mental models and decision heuristics; skip role-play and voice DNA."
 
-## 假设失效检查模板
+## Assumption Failure-Check Template
 
-Orient 第一步：列出 3 个当前假设并检验（Boyd "破坏与创造"）。
-
-```
-### 假设 1: {假设内容}
-- 支撑证据: {来自 Observe 的数据}
-- 反驳证据: {来自 Observe 的数据或逻辑推理}
-- 置信度: 高/中/低
-- 如果错了: {影响范围和备选方案}
-
-### 假设 2: ...
-### 假设 3: ...
-```
-
-低置信度假设 → 标记需要在 Decide 中验证或在 Create 中快速原型测试。
-
-## PUA P10 复盘三问
-
-大师会诊后，用 P10 视角做最终审视：
-
-1. **存在主义锚定**：这个项目在 the user solo team的版图中有意义吗？它是否服务于 specific user strategy and individual brand？
-2. **白痴指数**：当前做法的"成本" / 理论最低"成本" = ？如果指数 >5，有大幅优化空间。
-3. **五步算法第一问**：这个需求/功能/步骤为什么存在？谁提出的？能不能删掉？
-
-## A-grade benchmark 标杆对比清单
-
-拿现有 A 级 Skill 做品味校准（≥3 项全过才算 Orient 完成）：
-
-- [ ] **Router 表完整性**：是否像 design-md 一样有清晰的触发条件 → 工作流 → 输出物映射？
-- [ ] **NEVER 禁忌**：是否有 ≥5 条明确的"不做什么"？（防止 Agent 走歪路）
-- [ ] **Token 效率**：核心信息能否在 ��500 词内传达？（SKILL.md body 不超限）
-- [ ] **Progressive Disclosure**：重信息是否正确分层？（L1 metadata / L2 SKILL.md / L3 references）
-- [ ] **一人团队可维护**：the user 一个人能维护这个产出吗？复杂度是否可控？
-
-## Orient 输出格式
-
-Orient 完成后输出统一摘要：
+First step of Orient: list 3 current assumptions and stress-test them (Boyd "destruction and creation").
 
 ```
-## Orient 摘要
+### Assumption 1: {content}
+- Supporting evidence: {data from Observe}
+- Counter evidence: {data from Observe or logical reasoning}
+- Confidence: high / medium / low
+- If wrong: {blast radius and alternatives}
 
-### dominant view 主流观点（多数大师共识）
-{1-3 条核心方向建议}
-
-### minority view 少数派观点（有价值的异见）
-{1-2 条值得注意的���同看法}
-
-### 综合建议
-{基于主流+少数派合成的推荐方向}
-
-### 置信度
-整体: 高/中/低
-最大不确定性: {具体哪个方面}
-
-### 假设状态更新
-{哪些假设被验证/推翻/仍不确定}
+### Assumption 2: ...
+### Assumption 3: ...
 ```
 
-## Skill 调度强制规则
+Low-confidence assumptions → mark for verification in Decide or quick-prototype testing in Create.
 
-Orient 专家会诊**必须**用 `Skill()` 或 `Agent()` 实际调用。
+## PUA P10 Three Questions
 
-| ✅ 正确 | ❌ 错误（12 种偷懒 #1 #2） |
-|---------|--------------------------|
-| `Skill("feynman-perspective")` | "从费曼的角度来看..." |
-| `Agent(subagent_type="pua:cto-p10")` | "P10 三问已内联完成" |
-| `Skill("pua:p10")` 实际调用 | "PUA P10: 白痴指数约 5" |
+After the expert review, do a final P10 review:
 
-**唯一例外**: Plan Mode 下 Skill 不可用 → 用 Agent 代理，标注 `[via Agent 代理]`。
+1. **Existential anchoring**: Does this project make sense in the user's solo-team portfolio? Does it serve specific user strategy and individual brand?
+2. **Idiocy index**: current cost / theoretical minimum cost = ? If the index is >5, there is significant room for optimization.
+3. **First question of the five-step algorithm**: Why does this requirement/feature/step exist? Who proposed it? Can it be deleted?
 
-## PUA 完整参数格式
+## A-Grade Benchmark Comparison Checklist
 
-Orient 产出的 `pua:` 字段必须包含 4 个参数，缺任何一个 = 不完整：
+Use existing A-grade skills for taste calibration (≥3 must pass for Orient to be complete):
+
+- [ ] **Router-table completeness**: Like design-md, is there a clear mapping from trigger condition → workflow → output artifact?
+- [ ] **NEVER list**: Are there ≥5 explicit "do not do" items? (prevents the agent from drifting)
+- [ ] **Token efficiency**: Can the core information be conveyed in ≤500 words? (SKILL.md body within limit)
+- [ ] **Progressive Disclosure**: Are heavy details correctly layered? (L1 metadata / L2 SKILL.md / L3 references)
+- [ ] **Solo-team maintainable**: Can a single person maintain this output? Is the complexity manageable?
+
+## Orient Output Format
+
+Produce a unified summary at Orient close:
 
 ```
-pua: 味道=🟠阿里 | 压力=L2 | 红线=闭环验证+事实驱动+穷尽一切 | 切换链=阿里→🔴华为→⬛Musk
+## Orient summary
+
+### Dominant view (majority consensus among experts)
+{1-3 core direction recommendations}
+
+### Minority view (valuable dissent)
+{1-2 noteworthy contrarian opinions}
+
+### Synthesized recommendation
+{integrated direction based on dominant + minority}
+
+### Confidence
+Overall: high / medium / low
+Largest uncertainty: {specific area}
+
+### Assumption status update
+{which assumptions verified / refuted / still uncertain}
 ```
 
-## Fast-loop Orient 最低清单（不可跳过）
+## Skill Dispatch Hard Rule
 
-即使 fast-loop，[ORIENT_VERDICT] 仍必须包含所有字段：
-- assumptions: 3 个（可简短）
-- experts_invoked: 至少 1 个内联分析 + 框架名，标注 `[⚠️ fast]`
-- pua: 4 参数全写（味道/压力/红线/切换链）
-- pipeline_phases: 引用裁剪表说明哪些 Phase 执行
+Orient expert review **must** invoke `Skill()` or `Agent()` for real.
 
-**Fast ≠ 跳过。Fast = 精简但完整。**
+| ✅ Correct | ❌ Wrong (12 laziness patterns #1 #2) |
+|---|---|
+| `Skill("feynman-perspective")` | "From a Feynman perspective..." |
+| `Agent(subagent_type="pua:cto-p10")` | "P10 three questions completed inline" |
+| `Skill("pua:p10")` actual call | "PUA P10: idiocy index ~5" |
 
-## PUA 参数说明
-- **味道**: 方法论路由表自动选择（或用户指定）
-- **压力**: L1(首次)/L2(2次失败后)/L3(3次)/L4(5次+)
-- **红线**: 三条红线的本次检查点
-- **切换链**: 当前味道失败后的切换序列
+**Sole exception**: Plan Mode disables Skill → use Agent as proxy, tag `[via Agent proxy]`.
+
+## PUA Full Parameter Format
+
+The `pua:` field produced by Orient must include 4 parameters; missing any one = incomplete:
+
+```
+pua: flavor=🟠Alibaba | pressure=L2 | redlines=loop-closure+fact-driven+exhaustive | switch_chain=Alibaba→🔴Huawei→⬛Musk
+```
+
+## Fast-loop Orient Minimum Checklist (no skipping)
+
+Even in fast-loop, [ORIENT_VERDICT] must contain all fields:
+- assumptions: 3 (can be terse)
+- experts_invoked: at least 1 inline analysis + framework name, tagged `[⚠️ fast]`
+- pua: all 4 parameters (flavor / pressure / redlines / switch_chain)
+- pipeline_phases: cite the trim-table to explain which Phases run
+
+**Fast ≠ skip. Fast = condensed but complete.**
+
+## PUA Parameter Glossary
+- **flavor**: auto-selected by methodology routing table (or user-specified)
+- **pressure**: L1 (first time) / L2 (after 2 failures) / L3 (3) / L4 (5+)
+- **redlines**: this checkpoint of the three red lines
+- **switch_chain**: switch sequence when current flavor fails

@@ -1,54 +1,53 @@
-# Decide — 决策锁定模板
+# Decide — Decision Lock Template
 
-## 五要素锁定格式
+## Five-Element Lock Format
 
-每个项目必须锁定以下五要素，未锁定不进 Create：
-
-```
-项目名: {name}
-核心���象: {一句话：这个东西本质上是什么}
-技术栈: {语言/框架/关键依赖}
-文件拓扑: {目录结构概要}
-上游策略: {无上游 / 魔改上游(repo URL) / 全新}
-```
-
-## iCloud 归档推导
-
-五要素锁定时，按类型自动推导 iCloud 归档目录：
-
-| 类型 | iCloud 目录 |
-|------|-----------|
-| Skill / MCP / AI plugin / 工具 | 04-AI系统/ |
-| 方法论 / 框架 | 05-技能库/ |
-| X / 视频 / 长文 | 01-内容生产/ |
-| 金融 / DCA | 03-FINANCE/ |
-| 调研 / 竞品 | 06-调研报告/ |
-
-根路径: `~/Library/Mobile Documents/com~apple~CloudDocs/AI/Claude/`
-呈现: "iCloud 归档: {根路径}/{目录}/{项目名}/ — 确认？"
-
-## 决策点结构
-
-识别 3-4 个关键决策点。每个按以下格式：
+Every project must lock the following five elements before proceeding to Create:
 
 ```
-### DP-{N}: {决策问题}
-置信度: 高/中/低
+project_name: {name}
+core_abstraction: {one sentence: what this thing essentially is}
+tech_stack: {language / framework / key dependencies}
+file_topology: {directory structure outline}
+upstream_strategy: {none / fork upstream(repo URL) / greenfield}
+```
 
-| 选项 | 描述 | 优势 | 风险 |
-|------|------|------|------|
+## Local Archive Routing
+
+When the five elements are locked, derive the local archive directory by type:
+
+| Type | Suggested directory pattern |
+|---|---|
+| Skill / MCP / AI plugin / tool | `ai-systems/` |
+| Methodology / framework | `skill-library/` |
+| X / video / long-form content | `content-production/` |
+| Finance / DCA | `finance/` |
+| Research / competitor analysis | `research-reports/` |
+
+Root path is user-specific. Present: "Archive root: {root}/{dir}/{project_name}/ — confirm?"
+
+## Decision Point Structure
+
+Identify 3-4 key decision points. For each, follow this format:
+
+```
+### DP-{N}: {decision question}
+Confidence: high / medium / low
+
+| Option | Description | Pros | Risks |
+|---|---|---|---|
 | A | ... | ... | ... |
-| B (推荐) | ... | ... | ... |
+| B (recommended) | ... | ... | ... |
 | C | ... | ... | ... |
 
-推荐理由: {1-2句}
+Recommendation rationale: {1-2 sentences}
 ```
 
-置信度为"低"的决策点 → 标记需 the user 重点审批。
+Decision points with "low" confidence → mark for the user's focused approval.
 
 ## .upstream.json v3 Schema
 
-有上游依赖时，为每个文件标注处理策略：
+When there is an upstream dependency, annotate per-file strategy:
 
 ```json
 {
@@ -59,79 +58,79 @@
   "files": {
     "{filename}": {
       "strategy": "accept|customize|new|reject",
-      "upstream_path": "{上游路径，new 时为 null}",
-      "notes": "{处理说明}"
+      "upstream_path": "{upstream path; null when new}",
+      "notes": "{handling notes}"
     }
   }
 }
 ```
 
-策略含义：
-- `accept`: 原样保留，上游更新时直接同步
-- `customize`: 基于上游魔改，上游��新时需 diff review
-- `new`: the user 独创，上游无对应文件
-- `reject`: 上游有但不需要，明确排除
+Strategy semantics:
+- `accept`: keep as-is; sync directly when upstream updates
+- `customize`: customized from upstream; needs diff review when upstream updates
+- `new`: created by the user; no upstream counterpart
+- `reject`: upstream has it but we don't need it; explicitly excluded
 
-## 用户审批门禁
+## User-Approval Gate
 
-Decide 完成后，呈现以下格式等 the user 确认：
-
-```
-## 🔒 OODC Decide — 等待审批
-
-### 五要素
-[五要素表]
-
-### 决策点
-[DP-1 ~ DP-N 摘要，每个一行：决策+推荐+置信度]
-
-### 上游策略
-[.upstream.json 摘要或"无上游"]
-
-### 架构风险
-[≥3 条系统级风险，每条一行]
-
-⏸️ 确认后进入 Create。如需修改任何决策 → 修改后重跑一致性守卫。
-```
-
-## 一致性守卫（自动触发）
-
-**触发条件**：任何决策点的选项/推荐发生变更时。
-
-**执行步骤**：
-
-1. 提取变更的��策：旧值 → 新值
-2. 在 Plan 全文中搜索所有引用旧值的位置
-3. 对每个命中位置判断：引用是否仍然正确？
-4. 输出变更影响清单：
+After Decide is complete, present the following format and wait for the user's confirmation:
 
 ```
-| 位置 | 旧值 | 应改为 | 状态 |
-|------|------|--------|------|
-| §3 Observe Agent 3 | shelf/ 目录 | plugins/ 目录 | ✅ 已更新 |
-| §6 Create 闭环 | skill-check | plugin 验证 | ❌ 需更新 |
+## 🔒 OODC Decide — awaiting approval
+
+### Five elements
+[five-element table]
+
+### Decision points
+[DP-1 ~ DP-N summary, one line each: decision + recommendation + confidence]
+
+### Upstream strategy
+[.upstream.json summary or "no upstream"]
+
+### Architectural risks
+[≥3 system-level risks, one line each]
+
+⏸️ On confirmation, proceed to Create. To modify any decision → modify, then re-run the consistency guard.
 ```
 
-5. 所有状态为"❌ 需更新"的条目修复后，才允许进 Create
-6. Create 中途回退 Decide → 重跑一致性守卫 → 额外检查已写的代码/文件是否也需同步更新
+## Consistency Guard (auto-triggered)
 
-**决不跳过**：即使变更看起来很小（如改了一个路径），也必须全文扫描。教训三的根因就是"觉得改动小就不查"。
+**Trigger condition**: Any decision point's option / recommendation changes.
 
-## 偷砍需求检测（12 种偷懒 #8）
+**Steps**:
 
-**默认全做**。只有用户明确说"分批"/"后续再做"才允许拆分 Phase。
+1. Extract the changed decision: old value → new value.
+2. Search the entire Plan for all references to the old value.
+3. For each hit, judge: is the reference still correct?
+4. Output a change-impact list:
 
-检测信号:
-- Plan 中出现 "后续 sprint" / "本次不执行" / "Phase X 待做" → **阻断**
-- 除非用户原话包含这些词
+```
+| Location | Old value | Should be | Status |
+|---|---|---|---|
+| §3 Observe Agent 3 | shelf/ directory | plugins/ directory | ✅ updated |
+| §6 Create loop closure | skill-check | plugin verification | ❌ needs update |
+```
 
-## ExitPlanMode 前强制自审（12 种偷懒 #4）
+5. All "❌ needs update" entries must be fixed before Create can begin.
+6. If Create is rolled back to Decide → re-run the consistency guard → additionally check whether any code/files already written need to be synced.
 
-Decide 产出的 `consistency: PASS/FAIL` 字段，必须通过以下检查才能 PASS:
+**Never skip**: even if the change looks small (e.g., a single path tweak), the full Plan must be scanned. The root cause of past lesson #3 was "the change looked small, so it wasn't checked."
 
-1. Plan 顶部数字（文件数/概念数）= Plan 底部清单实际条数
-2. 所有 Phase 的描述一致（没有 Phase 2 说的跟 Phase 3 矛盾）
-3. 上游 .upstream.json 的文件数 = 实际文件拓扑的文件数
-4. 每个决策点的推荐在 Plan 后续内容中被执行（没有推荐了 A 但执行了 B）
+## Requirement-Trimming Detection (12 laziness patterns #8)
 
-`consistency: FAIL` → 不呈现给用户，先修复
+**Default: do everything**. Splitting Phases is allowed only if the user explicitly says "split into batches" / "do later".
+
+Detection signals:
+- Plan contains "future sprint" / "not in this round" / "Phase X TBD" → **abort**
+- Unless the user's own words include those phrases.
+
+## Mandatory Self-Audit Before ExitPlanMode (12 laziness patterns #4)
+
+Decide produces a `consistency: PASS/FAIL` field. It must pass the following checks before PASS:
+
+1. The numbers at the top of the Plan (file count / concept count) = the actual entry count at the bottom of the Plan.
+2. All Phase descriptions are consistent (no Phase 2 saying something Phase 3 contradicts).
+3. The file count in `.upstream.json` = the file count in the actual file topology.
+4. Each decision point's recommendation is executed in the rest of the Plan (no recommending A but executing B).
+
+`consistency: FAIL` → do not present to the user; fix first.

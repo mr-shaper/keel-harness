@@ -47,31 +47,31 @@ echo "═══ The 5 words ═══"
 sleep 1
 
 echo ""
-echo "## 1. 薄浇水律 (thin watering principle) — write handoffs incrementally, not at end"
+echo "## 1. Thin Watering Principle — write handoffs incrementally, not at end"
 sleep 0.4
 type_cmd "ls demo/sample-handoff.md"
 sleep 0.5
 
 echo ""
-echo "## 2. session 交接 7 字段 (7-field handoff schema, sanitized sample)"
+echo "## 2. 7-Field Handoff Schema (sanitized sample)"
 sleep 0.4
 type_cmd "head -13 demo/sample-handoff.md"
 sleep 0.8
 
 echo ""
-echo "## 3. Romeo 6 维 audit (Honesty/Ownership/TechDepth/Pattern Replay/Density/Candidates)"
+echo "## 3. Romeo 6-Dim Audit (Honesty/Ownership/TechDepth/Pattern Replay/Density/Candidates)"
 sleep 0.4
 type_cmd "grep -A 6 'Romeo 6' README.md | head -10"
 sleep 0.8
 
 echo ""
-echo "## 4. canonical 诚实律 (canonical honesty) — pre-commit BLOCK + verify-before-completion"
+echo "## 4. Canonical Honesty Rule — pre-commit BLOCK + verify-before-completion"
 sleep 0.4
 type_cmd "head -3 hooks/pre-commit"
 sleep 0.5
 
 echo ""
-echo "## 5. 4 层嵌套并行 (4-layer nested parallel)"
+echo "## 5. 4-Layer Nested Parallel"
 sleep 0.4
 echo "    Harness ⊃ OODC ⊃ Superpower(Phase 0-4) ⊃ PUA(P10/P9/P8/P7)"
 sleep 1.5

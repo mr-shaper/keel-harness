@@ -1,7 +1,7 @@
 {
   "name": "oodc",
   "version": "1.4.0",
-  "description": "OODC cognitive loop (Observe→Orient→Decide→Create) for building high-quality projects and skills. Use when starting novel projects, deep research needed, or user says 'OODC'/'oodc mode'/'全量调研'.",
+  "description": "OODC cognitive loop (Observe→Orient→Decide→Create) for building high-quality projects and skills. Use when starting novel projects, deep research needed, or user says 'OODC' / 'oodc mode' / 'full research first' / 'deep research'.",
   "author": {
     "name": "mr-shaper",
     "email": "mr-shaper@noreply.github.com",

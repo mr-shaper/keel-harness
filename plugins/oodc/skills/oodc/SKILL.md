@@ -3,8 +3,8 @@ name: oodc
 description: >
   Use when starting a new project (Skill/MCP/WebApp/CLI/Library/APP) that is novel
   to this ecosystem — first-time domain, upstream dependency, or deep research needed.
-  Use when user says "OODC" / "oodc mode" / "全量调研再做" / "先调研" / "深度调研" /
-  "observe orient decide create". Complements superpower-pipeline (slots into Phase 1-2).
+  Use when user says "OODC" / "oodc mode" / "full research first" / "research first" /
+  "deep research" / "observe orient decide create". Complements superpower-pipeline (slots into Phase 1-2).
   NOT for refactors of existing projects. NOT for small CLIs in familiar tech.
 ---
 
@@ -16,7 +16,7 @@ Slow-loop: `.oodc-state-{project}` blocks Write/Edit until CREATE. Read `~/.clau
 ## Mode
 
 Ask user: **"Fast or slow?"**
-- **Slow**: new domain / upstream / "深度调研". Run: `Bash: echo -e "step=OBSERVE\nproject={name}\nstarted=$(date -u +%FT%TZ)" > ~/.claude/.oodc-state-{name}`
+- **Slow**: new domain / upstream / "deep research". Run: `Bash: echo -e "step=OBSERVE\nproject={name}\nstarted=$(date -u +%FT%TZ)" > ~/.claude/.oodc-state-{name}`
 - **Fast**: familiar domain. No state file.
 
 ## OBSERVE
@@ -27,11 +27,11 @@ Tool routing: `web-access`=GitHub / `bird`=X / `notebooklm`=NLM. Details: `refer
 
 **Fast**: Run these commands:
 1. `Bash: python3 ~/.claude/plugins/tacit-kb/scripts/kb.py wakeup --tokens 400`
-2. `Bash: python3 ~/.claude/plugins/tacit-kb/scripts/kb.py query "{项目关键词}" --domain {domain} --top 3`
+2. `Bash: python3 ~/.claude/plugins/tacit-kb/scripts/kb.py query "{project_keywords}" --domain {domain} --top 3` (requires `tacit-kb` plugin — optional)
 3. `Bash: ls ~/.claude/skills/shelf/ | head -20`
-4. Read iCloud 相关目录
+4. Read related local doc directories
 
-NLM answers only. Down → `[⚠️ 非NLM]`.
+NLM answers only. Down → `[⚠️ non-NLM]`.
 
 **Required Output [OBSERVE_RESULT]**:
 `github:` {findings} | `x:` {insights} | `nlm:` {Q&A} | `local:` {assets} | `source_count:` N
@@ -84,11 +84,11 @@ See `references/create-protocol.md`.
 2. **GREEN**: Minimal fix for observed failures
 3. **REFACTOR**: Knowledge injection + loopholes + validation
 4. **KB** (MANDATORY): Run: `Bash: python3 ~/.claude/plugins/tacit-kb/scripts/kb.py extract --type decision --domain {domain} --write --data '{...}'` — paste output
-5. **记忆库** (MANDATORY): AI 草拟 → the user approve/skip — show draft
+5. **Memory log** (MANDATORY): AI drafts → the user approves/skips — show draft
 
 **Required Output [CLOSURE_EVIDENCE]**:
 `tests:` {paste stdout} | `wordcount:` {paste wc -w} | `kb:` {paste kb.py output} | `docsync:` {paste files}
 
 Done = tests: paste 5 RED stdout. kb: paste kb.py output. Verify: `Bash: wc -w` + `Bash: kb.py status | head -3`
-"全部通过" without pasted output = INVALID. Expert review: 1-2 Skill calls.
+"all passed" claim without pasted output = INVALID. Expert review: 1-2 Skill calls.
 Cleanup: `Bash: rm ~/.claude/.oodc-state-{project}`

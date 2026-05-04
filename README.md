@@ -1,4 +1,6 @@
-# harness-engineering
+# keel-harness
+
+**🇺🇸 English** · [🇨🇳 中文](README.zh-CN.md)
 
 > Harness for Claude Code: 24h cross-session continuity + canonical honesty enforcement + P10-9-8-7 nested parallel agent topology — Karpathy's agentic engineering, made enforceable.
 
@@ -67,7 +69,7 @@ claude plugin install superpowers@superpowers-marketplace
 
 Repo: https://github.com/obra/superpowers · License: MIT · Version tested: 5.0.7
 
-### 2. PUA (MIT, 探微安全实验室 / @tanweai)
+### 2. PUA (MIT, TanWei Security Lab / @tanweai)
 
 Provides: P10/P9/P8/P7 role protocols, red-line enforcement, Romeo evaluator,
 parallel agent topology, performance pressure escalation.
@@ -171,7 +173,7 @@ power user.
 ### Templates
 
 - `templates/handoff-template.md` — 7-field handoff schema (sprint / next_action / blockers / decisions / files_changed / self_check / romeo_score)
-- `templates/cat-h-律-template.md` — Category H canonical law template (for adding new ratified rules)
+- `templates/cat-h-rule-template.md` — Category H canonical law template (for adding new ratified rules)
 - `templates/CLAUDE.md.global.template` — Generic global Claude Code contract (~180 LOC, scrubbed of personal config)
 - `templates/CLAUDE.md.project.template` — Generic project contract (~50 LOC, 5-must-reads + 5-self-checks + bible principles placeholder)
 - `templates/settings.json.template` — Generic settings.json with 8 enforce-core hooks registered (~80 LOC)
@@ -246,11 +248,11 @@ engineering lexicon:
 
 | Term | Definition |
 |---|---|
-| **Thin Watering Principle** (薄浇水律) | Apply harness constraints as a thin, universal layer — never couple enforcement to private personal config. The harness should work for anyone without modification. |
-| **7-Field Handoff Schema** (session 交接 7 字段) | The minimum viable handoff: `sprint / next_action / blockers / decisions / files_changed / self_check / romeo_score`. Missing any field = the next session is flying blind. |
-| **Romeo 6-Dim Audit** (Romeo 6 维 audit) | Six independent dimensions — Honesty, Ownership, TechDepth, PatternReplay, Density, Candidates — each scored 0-1.00. Overall bar: average ≥0.99 hardcore. Not a checklist, a judgment framework. |
-| **Canonical Honesty Rule** (canonical 诚实律) | Every claim requires evidence paste. "It works" without command output = 0 points. The hook system enforces this at the PreToolUse layer, before the AI can write a completion. |
-| **4-Layer Nested Parallel** (4 层嵌套并行) | Harness ⊃ OODC ⊃ Superpower Phase 0-4 ⊃ PUA P10-9-8-7. Concurrency at every layer. Not just "run agents in parallel" — structured parallelism with role separation and file domain isolation. |
+| **Thin Watering Principle** | Apply harness constraints as a thin, universal layer — never couple enforcement to private personal config. The harness should work for anyone without modification. |
+| **7-Field Handoff Schema** | The minimum viable handoff: `sprint / next_action / blockers / decisions / files_changed / self_check / romeo_score`. Missing any field = the next session is flying blind. |
+| **Romeo 6-Dim Audit** | Six independent dimensions — Honesty, Ownership, TechDepth, PatternReplay, Density, Candidates — each scored 0-1.00. Overall bar: average ≥0.99 hardcore. Not a checklist, a judgment framework. |
+| **Canonical Honesty Rule** | Every claim requires evidence paste. "It works" without command output = 0 points. The hook system enforces this at the PreToolUse layer, before the AI can write a completion. |
+| **4-Layer Nested Parallel** | Harness ⊃ OODC ⊃ Superpower Phase 0-4 ⊃ PUA P10-9-8-7. Concurrency at every layer. Not just "run agents in parallel" — structured parallelism with role separation and file domain isolation. |
 
 ---
 
