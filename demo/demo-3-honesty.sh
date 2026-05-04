@@ -54,7 +54,7 @@ sleep 0.6
 echo "(expected: BLOCK with hit keywords)"
 sleep 0.6
 # simulate grep that pre-commit would do — visible to user
-manifest_kw="mrshaper|sk-ant|mrshaper|mr-shaper@example.test"
+manifest_kw="mrshaper|sk-ant|mr-shaper|@example.test"
 echo ""
 echo "→ pre-commit would scan and see:"
 grep -E "$manifest_kw" attack.md && echo ""
