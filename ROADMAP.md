@@ -14,6 +14,29 @@ and P1 findings before the public flip. The audit also surfaced a handful
 of P2 (cosmetic / consistency) items that were intentionally deferred. They
 land here.
 
+- ~~🔴 **[LAUNCH BLOCKER — P0 user-safety] `install.sh` Phase 2b silently
+  overwrites the user's `$PWD/CLAUDE.md`.** Lines 371-373 do `cp
+  templates/CLAUDE.md.project.template $PWD/CLAUDE.md` with no
+  backup, no skip-if-exists, no interactive prompt. Any user who runs the
+  one-liner `curl ... | bash` while `cd`'d in their existing project
+  directory loses their project CLAUDE.md without warning. Reproduction:
+  `mkdir /tmp/x && cd /tmp/x && echo "MY NOTES" > CLAUDE.md && bash
+  /path/to/install.sh --dry-run --skip-deps-check` → dry-run output ends
+  with `would: cp templates/CLAUDE.md.project.template → /tmp/x/CLAUDE.md`
+  with zero overwrite warning. Fix: mirror Phase 2a's pattern (detect
+  existing → backup `.harness-backup-<ts>` → interactive prompt with diff
+  preview → cp only on Y). Must ship before any public launch posting.~~
+  → ✅ **Fixed in v0.1.0-alpha.1**, see [release notes](https://github.com/mr-shaper/keel-harness/releases/tag/v0.1.0-alpha.1) and [CHANGELOG](CHANGELOG.md#v010-alpha1)
+
+- 🔴 **[LAUNCH-READINESS related] `install.sh` Phase 1 also silently
+  overwrites `${HARNESS_HOME}/*` if user already had files there.**
+  Lower severity than 2b because `~/.claude/plugins/keel-harness-mp/` is
+  the harness's own plugin directory — but still: if the user manually
+  customized any kernel file (e.g., a hook script), re-running install
+  loses that change. Fix: add an integrity hash check that warns when an
+  installed kernel file's hash differs from the template's hash, and
+  prompts before overwriting.
+
 - **Stale file counts in install.sh, tests/test-install.sh, README.md.**
   Several places hardcode `29 kernel_files` or `23 kernel files` or
   `8 enforce-core hooks (~80 LOC)`. The actual numbers are 50, 50, and

@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.1] — 2026-05-04 — User-safety hotfix
+
+### Fixed
+
+- 🔴 **P0 user-safety**: `install.sh` Phase 2b silently overwrote `$PWD/CLAUDE.md`
+  (the user's project CLAUDE.md) with the harness template, with no backup, no
+  interactive prompt, and no skip-if-exists. Any user who ran `curl ... | bash`
+  while cd'd in their existing project directory lost their project CLAUDE.md
+  without warning. (Reported by Harrison via dogfood; fixed in this release.)
+- Phase 2a (global `~/.claude/CLAUDE.md`) had the inverse problem: it
+  interactively prompted but lacked an idempotent skip — re-running install
+  would append the harness section a second time, eventually a third time, etc.
+
+### Changed
+
+- Both Phase 2a (global) and Phase 2b (project) now share a single
+  `safe_install_claude_md_section()` helper that follows the pattern: detect
+  existing → if harness section already present, skip (idempotent) → else backup
+  to `*.harness-backup-<timestamp>` → interactively prompt with default Y →
+  append section on Y, skip with warning on N. Backup happens BEFORE the prompt
+  so even a user typo cannot lose data.
+
+### Verification
+
+- New test suite `tests/test-install-claude-md-safety.sh` covers 6 cases
+  (new install, idempotent skip, backup-then-append, backup-then-skip,
+  dry-run safety).
+- All 5 existing test suites still PASS (no regression).
+
+---
+
 ## [Unreleased] — 2026-05-04 (S3-OSS-iter sprint)
 
 OSS kernel hardening derived from cross-host sync-fix retrospective.

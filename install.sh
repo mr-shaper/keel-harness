@@ -292,32 +292,12 @@ phase1_5_install_bundled_plugins() {
 }
 
 # ── Phase 2: CLAUDE.md merge ──────────────────────────────────────────────────
-phase2_claude_md() {
-  info "Phase 2: CLAUDE.md merge"
 
-  local global_template="${REPO_ROOT}/templates/CLAUDE.md.global.template"
-  local project_template="${REPO_ROOT}/templates/CLAUDE.md.project.template"
-  local global_dest="${CLAUDE_HOME}/CLAUDE.md"
-  local project_dest="${PWD}/CLAUDE.md"
-
-  # --- Global CLAUDE.md ---
-  if [[ "$DRY_RUN" == "1" ]]; then
-    if [[ -f "$global_dest" ]]; then
-      dry "prompt: Merge harness mode contract section into ${global_dest}? [Y/n]"
-    else
-      dry "cp ${global_template} → ${global_dest}"
-    fi
-  elif [[ -f "$global_dest" ]]; then
-    echo ""
-    echo "  Found existing ${global_dest}"
-    printf "  Append harness mode contract section to global CLAUDE.md? [Y/n] "
-    local answer
-    read -r answer
-    answer="${answer:-Y}"
-    if [[ "$answer" =~ ^[Yy]$ ]]; then
-      # Append harness mode contract section
-      local harness_section
-      harness_section=$(cat <<'HARNESS_CONTRACT'
+# Harness section template — single definition used by both Phase 2a and 2b.
+# Marker substring "## §harness mode" is guaranteed to be present in this block
+# and is used as the idempotency grep key.
+_harness_section_content() {
+  cat <<'HARNESS_CONTRACT'
 
 ## §harness mode Activation Rules (Project Entry Anchor)
 
@@ -347,34 +327,90 @@ Automatically activates when entering a harness project (project with `.harness/
 - Q4 Fix Method B: grep LATEST_HANDOFF_NAME literal, no fallback
 
 HARNESS_CONTRACT
-)
-      echo "" >> "$global_dest"
-      echo "$harness_section" >> "$global_dest"
-      success "Phase 2a: Appended harness contract to ${global_dest}"
+}
+
+# safe_install_claude_md_section TARGET_PATH LABEL NEW_INSTALL_TEMPLATE
+#
+# Branches (matching spec):
+#   1. TARGET_PATH does not exist  → cp NEW_INSTALL_TEMPLATE → TARGET_PATH (new install)
+#   2. TARGET_PATH exists AND already contains "## §harness mode"
+#                                  → idempotent skip (no backup, no prompt)
+#   3. TARGET_PATH exists, no harness section
+#                                  → backup FIRST, then prompt, then append on Y
+#
+# In DRY_RUN mode: prints what WOULD happen (including backup path and branch taken).
+# Respects set -euo pipefail throughout.
+safe_install_claude_md_section() {
+  local target_path="$1"
+  local label="$2"
+  local new_install_template="$3"
+  local harness_marker="## §harness mode"
+
+  if [[ "$DRY_RUN" == "1" ]]; then
+    if [[ ! -f "$target_path" ]]; then
+      dry "${label}: target does not exist → would cp ${new_install_template} → ${target_path}  [branch: new install]"
+    elif grep -q "$harness_marker" "$target_path" 2>/dev/null; then
+      dry "${label}: harness section already present in ${target_path} → would skip  [branch: idempotent]"
     else
-      warn "Phase 2a: Skipped global CLAUDE.md merge (user chose N)"
-      warn "  You can manually append from: ${global_template}"
+      local backup_path="${target_path}.harness-backup-$(date +%s)"
+      dry "${label}: file exists, no harness section → would backup to ${backup_path}  [branch: backup+prompt]"
+      dry "${label}: → would prompt 'Append harness mode anchor section to ${target_path}? [Y/n]'"
+      dry "${label}: → on Y: append harness section; on N: skip with warning"
     fi
-  else
-    if [[ -f "$global_template" ]]; then
-      cp "$global_template" "$global_dest"
-      success "Phase 2a: Created ${global_dest} from template"
-    else
-      warn "Phase 2a: global template not found at ${global_template} — skipping"
-    fi
+    return 0
   fi
 
-  # --- Project CLAUDE.md ---
-  if [[ "$DRY_RUN" == "1" ]]; then
-    dry "cp ${project_template} → ${project_dest}"
-  else
-    if [[ -f "$project_template" ]]; then
-      cp "$project_template" "$project_dest"
-      success "Phase 2b: Project CLAUDE.md created at ${project_dest}"
+  if [[ ! -f "$target_path" ]]; then
+    # Branch 1: new install
+    if [[ -f "$new_install_template" ]]; then
+      cp "$new_install_template" "$target_path"
+      success "${label}: Created ${target_path} from template"
     else
-      warn "Phase 2b: project template not found at ${project_template} — skipping"
+      warn "${label}: template not found at ${new_install_template} — skipping"
     fi
+    return 0
   fi
+
+  if grep -q "$harness_marker" "$target_path" 2>/dev/null; then
+    # Branch 2: idempotent — harness section already present
+    info "${label}: harness section already present in ${target_path}, skipping (idempotent)"
+    return 0
+  fi
+
+  # Branch 3: file exists, no harness section — backup FIRST, then prompt
+  local backup_path="${target_path}.harness-backup-$(date +%s)"
+  cp "$target_path" "$backup_path"
+  info "${label}: Backup: ${backup_path}"
+
+  echo ""
+  echo "  Found existing ${target_path} (no harness section)"
+  printf "  Append harness mode anchor section to ${target_path}? [Y/n] "
+  local answer
+  read -r answer
+  answer="${answer:-Y}"
+  if [[ "$answer" =~ ^[Yy]$ ]]; then
+    printf '\n' >> "$target_path"
+    _harness_section_content >> "$target_path"
+    success "${label}: Appended harness contract to ${target_path}"
+  else
+    warn "${label}: Skipped (user chose N). Backup: ${backup_path}"
+    warn "  Manual append: cat <harness section> >> ${target_path}"
+  fi
+}
+
+phase2_claude_md() {
+  info "Phase 2: CLAUDE.md merge"
+
+  local global_template="${REPO_ROOT}/templates/CLAUDE.md.global.template"
+  local project_template="${REPO_ROOT}/templates/CLAUDE.md.project.template"
+  local global_dest="${CLAUDE_HOME}/CLAUDE.md"
+  local project_dest="${PWD}/CLAUDE.md"
+
+  # Phase 2a: global ~/.claude/CLAUDE.md
+  safe_install_claude_md_section "$global_dest" "Phase 2a" "$global_template"
+
+  # Phase 2b: project $PWD/CLAUDE.md
+  safe_install_claude_md_section "$project_dest" "Phase 2b" "$project_template"
 }
 
 # ── Phase 3: settings.json jq merge ──────────────────────────────────────────
