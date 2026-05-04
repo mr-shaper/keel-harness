@@ -1,0 +1,5 @@
+{
+  "name": "compound-selfcheck",
+  "version": "0.1.0",
+  "description": "Auto-remind to ingest large changes into knowledge base for Compound Engineering"
+}

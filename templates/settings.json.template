@@ -1,7 +1,7 @@
 {
   "_comment": "harness-engineering settings.json.template v0.1.0 — generic, no private keys, no user-specific preferences. Install via: jq -s '.[0] * .[1]' ~/.claude/settings.json templates/settings.json.template > /tmp/settings-merged.json && mv /tmp/settings-merged.json ~/.claude/settings.json",
   "_harness_version": "0.1.0",
-  "_harness_hooks_count": 8,
+  "_harness_hooks_count": 9,
 
   "enabledPlugins": {
     "harness-engineering-plugin@harness-engineering-mp": true
@@ -82,6 +82,16 @@
           }
         ],
         "matcher": "Write|Edit|MultiEdit"
+      },
+      {
+        "hooks": [
+          {
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/plugins/compound-selfcheck-plugin/hooks/post-tool-compound-check.sh",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit"
       }
     ],
 

@@ -102,6 +102,7 @@ during Phase 1.5. No separate download.
 | Plugin | License | What it provides |
 |---|---|---|
 | **OODC** v1.4.0 | Apache-2.0 (by mr-shaper) | Cognitive loop: Observe → Orient → Decide → Create. 4 reference protocols. Used by `workflows/oodc-superpower-harness-orchestration.md` |
+| **compound-selfcheck** v0.1.0 | Apache-2.0 (by mr-shaper) | PostToolUse soft-prompt: when a Write/Edit produces > 100 LOC or > 5KB, emits a stderr reminder to ingest the change into a knowledge base (Compound Engineering, not one-shot). Audit-logs `[COMPOUND-CHECK]` entries to `.harness/hook-trace.log` for "real-trigger vs performance" detection. Soft-prompt only — never blocks. |
 
 ---
 
@@ -181,12 +182,15 @@ power user.
 ### Audit Framework
 
 - `audit/romeo-6-dim-framework.md` — Romeo 6-dimensional audit spec (Honesty / Ownership / TechDepth / PatternReplay / Density / Candidates), ≥0.99 hardcore gate, evidence-alignment rules
+- `docs/sprint-kickoff-checklist.md` — Five-layer GATE self-check (Layer A entity / B content / C gate / D config / E behavior fire). Mandatory at every sprint kickoff to prevent score inflation
 
 ### Tooling
 
 - `sync.sh` — 5-command sync (init / export / import / diff / release) with 5-layer privacy protection
+- `scripts/sync-self-check.sh` — Cross-platform 5-layer evidence dump. Maintainer reads the dump and self-evaluates sprint outcome (the script never decides outcome itself — P9-doesn't-decide-L4 pattern). Supports `--dry-run`
 - `manifest.json` — Kernel file whitelist + private blacklist keywords (what stays in, what never ships)
 - `install.sh` — One-line bootstrap (ships W3)
+- `CHANGELOG.md` — [Keep a Changelog](https://keepachangelog.com/) format, semver tags
 - `LICENSE` — Apache-2.0
 
 ---

@@ -16,12 +16,32 @@ else
 fi
 [[ -z "${PAYLOAD}" ]] && PAYLOAD="{}"
 
-# ── Resolve repo root ─────────────────────────────────────────────────────────
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-HARNESS_DIR="${REPO_ROOT}/.harness"
+# ── resolve_harness_root: three-path fallback ─────────────────────────────────
+# Returns 0 and sets HARNESS_DIR when a valid .harness/ dir is found.
+# Returns 1 when no valid root is found (caller should exit 0 silently).
+resolve_harness_root() {
+  local candidate
 
-# ── Skip if not a harness project ────────────────────────────────────────────
-if [[ ! -d "${HARNESS_DIR}" ]]; then
+  # Priority 1: git repo root (current behaviour)
+  candidate="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  if [[ -n "${candidate}" && -d "${candidate}/.harness" ]]; then
+    HARNESS_DIR="${candidate}/.harness"
+    return 0
+  fi
+
+  # Priority 2: HARNESS_ROOT env var
+  if [[ -n "${HARNESS_ROOT:-}" && -d "${HARNESS_ROOT}/.harness" ]]; then
+    HARNESS_DIR="${HARNESS_ROOT}/.harness"
+    return 0
+  fi
+
+  # Priority 3: silent OK — not a harness project
+  return 1
+}
+
+# ── Resolve harness dir ───────────────────────────────────────────────────────
+HARNESS_DIR=""
+if ! resolve_harness_root; then
   exit 0
 fi
 
