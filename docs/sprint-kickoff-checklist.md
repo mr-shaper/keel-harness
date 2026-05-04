@@ -32,20 +32,29 @@ work valid. Every dimension must produce pasted evidence — assertion alone fai
 
 ## §3 Five-Layer GATE Self-Check
 
+> **Setup:** Set `HARNESS_ROOT` to your harness install path before running any
+> command in this section. Example:
+> ```bash
+> export HARNESS_ROOT="${HARNESS_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+> ```
+> All commands below use `${HARNESS_ROOT}` so they are portable across install
+> locations (e.g., `~/.claude/plugins/keel-harness-mp/` for an OSS install or
+> `~/dev/your-harness-clone/` for a development checkout).
+
 ### Layer A — Entity (Files / Dirs / Binaries Exist)
 
 Verify that all required scripts, plugin directories, and settings files are physically present.
 
 | Item | Command | PASS Evidence |
 |------|---------|--------------|
-| Hook scripts exist | `ls ~/dev/harness-engineering/hooks/` | Expected `.sh` files listed |
-| Plugin directories present | `ls ~/dev/harness-engineering/plugins/` | Plugin subdirs visible |
-| Settings file present | `ls ~/dev/harness-engineering/.claude/settings.json` | File path printed |
-| Manifest present | `ls ~/dev/harness-engineering/manifest.json` | File path printed |
+| Hook scripts exist | `ls ${HARNESS_ROOT}/hooks/` | Expected `.sh` files listed |
+| Plugin directories present | `ls ${HARNESS_ROOT}/plugins/` | Plugin subdirs visible |
+| Settings file present | `ls ${HARNESS_ROOT}/.claude/settings.json` | File path printed |
+| Manifest present | `ls ${HARNESS_ROOT}/manifest.json` | File path printed |
 
 **Evidence command example:**
 ```bash
-ls ~/dev/harness-engineering/hooks/ && ls ~/dev/harness-engineering/plugins/
+ls ${HARNESS_ROOT}/hooks/ && ls ${HARNESS_ROOT}/plugins/
 ```
 
 ---
@@ -56,15 +65,15 @@ Verify file contents match expectations: correct line counts, required keywords 
 
 | Item | Command | PASS Evidence |
 |------|---------|--------------|
-| Hook script non-empty | `wc -l ~/dev/harness-engineering/hooks/<hook>.sh` | `≥10` lines |
-| Manifest has entries | `grep -c '"name"' ~/dev/harness-engineering/manifest.json` | `≥1` |
-| HARNESS_BIBLE.md Layer 0 present | `grep -c "Layer 0" ~/dev/harness-engineering/HARNESS_BIBLE.md` | `≥1` |
-| Settings contains hooks key | `grep -c '"hooks"' ~/dev/harness-engineering/.claude/settings.json` | `≥1` |
+| Hook script non-empty | `wc -l ${HARNESS_ROOT}/hooks/<hook>.sh` | `≥10` lines |
+| Manifest has entries | `grep -c '"name"' ${HARNESS_ROOT}/manifest.json` | `≥1` |
+| HARNESS_BIBLE.md Layer 0 present | `grep -c "Layer 0" ${HARNESS_ROOT}/HARNESS_BIBLE.md` | `≥1` |
+| Settings contains hooks key | `grep -c '"hooks"' ${HARNESS_ROOT}/.claude/settings.json` | `≥1` |
 
 **Evidence command example:**
 ```bash
-wc -l ~/dev/harness-engineering/hooks/*.sh
-grep -c '"name"' ~/dev/harness-engineering/manifest.json
+wc -l ${HARNESS_ROOT}/hooks/*.sh
+grep -c '"name"' ${HARNESS_ROOT}/manifest.json
 ```
 
 ---
@@ -75,14 +84,14 @@ Verify hooks are registered with correct event types and matchers — not just f
 
 | Item | Command | PASS Evidence |
 |------|---------|--------------|
-| Hook event types present | `grep -E '"event_type"|"matcher"' ~/dev/harness-engineering/.claude/settings.json` | Correct event names shown |
-| Stop hook registered | `grep -c "Stop" ~/dev/harness-engineering/.claude/settings.json` | `≥1` |
-| PreToolUse hook registered | `grep -c "PreToolUse" ~/dev/harness-engineering/.claude/settings.json` | `≥1` |
-| Hook matchers not empty | `python3 -c "import json,sys; d=json.load(open('~/dev/harness-engineering/.claude/settings.json'.replace('~', __import__('os').path.expanduser('~')))); hooks=d.get('hooks',{}); print(len(hooks))"` | `≥1` |
+| Hook event types present | `grep -E '"event_type"|"matcher"' ${HARNESS_ROOT}/.claude/settings.json` | Correct event names shown |
+| Stop hook registered | `grep -c "Stop" ${HARNESS_ROOT}/.claude/settings.json` | `≥1` |
+| PreToolUse hook registered | `grep -c "PreToolUse" ${HARNESS_ROOT}/.claude/settings.json` | `≥1` |
+| Hook matchers not empty | `python3 -c "import json,sys; d=json.load(open('${HARNESS_ROOT}/.claude/settings.json'.replace('~', __import__('os').path.expanduser('~')))); hooks=d.get('hooks',{}); print(len(hooks))"` | `≥1` |
 
 **Evidence command example:**
 ```bash
-grep -E '"event_type"|"matcher"|"Stop"|"PreToolUse"' ~/dev/harness-engineering/.claude/settings.json
+grep -E '"event_type"|"matcher"|"Stop"|"PreToolUse"' ${HARNESS_ROOT}/.claude/settings.json
 ```
 
 ---
@@ -93,15 +102,15 @@ Verify environment variables, settings.json fields, and plugin metadata are corr
 
 | Item | Command | PASS Evidence |
 |------|---------|--------------|
-| Plugin metadata present | `grep -c '"version"' ~/dev/harness-engineering/plugins/*/plugin.json` | `≥1` per plugin |
-| HARNESS_BIBLE version field | `grep -m1 "version" ~/dev/harness-engineering/HARNESS_BIBLE.md` | Version string visible |
-| Manifest version field | `python3 -c "import json; d=json.load(open('$(eval echo ~/dev/harness-engineering/manifest.json)')); print(d.get('version','MISSING'))"` | Non-empty version |
-| State file present (if active session) | `cat ~/dev/harness-engineering/.harness/state` | Session state content |
+| Plugin metadata present | `grep -c '"version"' ${HARNESS_ROOT}/plugins/*/plugin.json` | `≥1` per plugin |
+| HARNESS_BIBLE version field | `grep -m1 "version" ${HARNESS_ROOT}/HARNESS_BIBLE.md` | Version string visible |
+| Manifest version field | `python3 -c "import json; d=json.load(open('$(eval echo ${HARNESS_ROOT}/manifest.json)')); print(d.get('version','MISSING'))"` | Non-empty version |
+| State file present (if active session) | `cat ${HARNESS_ROOT}/.harness/state` | Session state content |
 
 **Evidence command example:**
 ```bash
-grep -r '"version"' ~/dev/harness-engineering/plugins/ | head -5
-cat ~/dev/harness-engineering/.harness/state 2>/dev/null || echo "no active session"
+grep -r '"version"' ${HARNESS_ROOT}/plugins/ | head -5
+cat ${HARNESS_ROOT}/.harness/state 2>/dev/null || echo "no active session"
 ```
 
 ---
@@ -112,15 +121,15 @@ Verify hooks have actually fired in this session — trace log entries, not just
 
 | Item | Command | PASS Evidence |
 |------|---------|--------------|
-| Hook trace log exists | `ls ~/dev/harness-engineering/.harness/hook-trace.log` | File path printed |
-| Stop hook fired this session | `grep -c "Stop" ~/dev/harness-engineering/.harness/hook-trace.log` | `≥1` entry |
-| Compound check fired | `grep -c "COMPOUND-CHECK" ~/dev/harness-engineering/.harness/hook-trace.log` | `≥1` (if LOC>100 write occurred) |
-| Latest hook fire timestamp | `tail -n5 ~/dev/harness-engineering/.harness/hook-trace.log` | Recent timestamps visible |
+| Hook trace log exists | `ls ${HARNESS_ROOT}/.harness/hook-trace.log` | File path printed |
+| Stop hook fired this session | `grep -c "Stop" ${HARNESS_ROOT}/.harness/hook-trace.log` | `≥1` entry |
+| Compound check fired | `grep -c "COMPOUND-CHECK" ${HARNESS_ROOT}/.harness/hook-trace.log` | `≥1` (if LOC>100 write occurred) |
+| Latest hook fire timestamp | `tail -n5 ${HARNESS_ROOT}/.harness/hook-trace.log` | Recent timestamps visible |
 
 **Evidence command example:**
 ```bash
-tail -n10 ~/dev/harness-engineering/.harness/hook-trace.log
-grep -cE "Stop|PreToolUse|PostToolUse" ~/dev/harness-engineering/.harness/hook-trace.log
+tail -n10 ${HARNESS_ROOT}/.harness/hook-trace.log
+grep -cE "Stop|PreToolUse|PostToolUse" ${HARNESS_ROOT}/.harness/hook-trace.log
 ```
 
 ---
@@ -135,7 +144,7 @@ grep -cE "Stop|PreToolUse|PostToolUse" ~/dev/harness-engineering/.harness/hook-t
 | **D Config** | Plugin metadata / version | `grep -r '"version"' plugins/` | Non-empty per plugin |
 | **E Behavior** | Trace log real fire count | `tail -n10 .harness/hook-trace.log` | Recent entries visible |
 
-> All commands run from `~/dev/harness-engineering` working directory.
+> All commands assume `${HARNESS_ROOT}` is set (see §3 setup block).
 
 ---
 

@@ -91,6 +91,47 @@ Four enhancements that strengthen the universal kernel without exposing private 
 - This sprint introduces no new `Category H` rules; all changes are kernel
   refinements within the existing `v1.13` ratified scope.
 
+### S3.5 patches (multi-perspective blind audit follow-up)
+
+A second sprint dispatched 3 independent audit perspectives (security/PII deep
+scan / OSS maintainer DX / agentic engineering quality) on top of the Romeo
+6-dim audit. Each surfaced concrete defects that Romeo's framework did not
+catch. Cross-audit consensus fixes:
+
+- **`README.md`** — Static "passing" CI badge replaced with the live GitHub
+  Actions badge (linked to the actual `tests.yml` workflow). The static badge
+  was always green regardless of CI state, eroding trust.
+- **`README.md`** — Removed the false `--dry-run` capability claim from the
+  `scripts/sync-self-check.sh` description. The script is read-only by design
+  and accepts no flags; the documented capability did not exist.
+- **`plugins/compound-selfcheck-plugin/README.md`** — Install snippet path
+  corrected: `harness-engineering-mp` → `keel-harness-mp` (the public
+  namespace used by `install.sh`). The previous path would have produced a
+  silently-broken hook on any install.
+- **`templates/settings.json.template`** — Bulk rename of the marketplace name
+  and all hook-command paths from `harness-engineering-mp` to
+  `keel-harness-mp`. The template's previous default disagreed with
+  `install.sh`'s `HARNESS_HOME` choice, meaning hooks would fail to fire on a
+  default install (P0 severity bug from the rename in W6 Step 2.5 that the
+  template missed).
+- **`docs/sprint-kickoff-checklist.md`** — All hardcoded `~/dev/harness-engineering/`
+  paths replaced with `${HARNESS_ROOT}` and a setup preamble explaining the
+  variable. Previously every command in the checklist was non-portable — a
+  fresh OSS clone could not run a single command from the document as-is.
+- **`HARNESS_BIBLE.md`** — Two private-path leaks redacted: a
+  `~/.claude-codepilot/plans/...` reference and an `iCloud/.../knowledge-base/...`
+  reference. Both were protected only by `SKIP_PATHS` exemption (HARNESS_BIBLE.md
+  is a SKIP-listed file, so the pre-commit hook could not catch them).
+  HARNESS_BIBLE.md `> ZERO ... maintainer references` line generalized away from
+  a specific maintainer name.
+- **`manifest.json`** — `private_blacklist_keywords` adds three more terms:
+  `harness-engineering-mp` (the obsolete pre-rename namespace),
+  `MBP` (private device abbreviation),
+  `Roy` (private maintainer first name). Total blacklist this sprint: 11 new
+  scope-forbidden terms (`Maintainer`, `CLAUDE_CONFIG_DIR`, `MBP`, `Mobile
+  Documents`, `Mrs-Mac-mini`, `Mrs-MacBook-Pro`, `Roy`, `claude-codepilot`,
+  `claude-roy` was already there, `codepilot`, `dual-runtime`, `harness-engineering-mp`).
+
 ### Candidates (forward-looking notes for future sprints)
 
 - **[CANDIDATE] Per-subdirectory pre-commit `SKIP_PATHS`**: The W6 era

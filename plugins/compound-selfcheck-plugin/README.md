@@ -17,7 +17,7 @@ Add to your `settings.json` (see `templates/settings.json.template`):
   "hooks": {
     "PostToolUse": [{
       "hooks": [{
-        "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/plugins/compound-selfcheck-plugin/hooks/post-tool-compound-check.sh",
+        "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/plugins/compound-selfcheck-plugin/hooks/post-tool-compound-check.sh",
         "timeout": 10,
         "type": "command"
       }],

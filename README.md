@@ -5,7 +5,7 @@
 > Harness for Claude Code: 24h cross-session continuity + canonical honesty enforcement + P10-9-8-7 nested parallel agent topology — Karpathy's agentic engineering, made enforceable.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/mr-shaper/keel-harness/actions)
+[![CI](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml/badge.svg)](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml)
 [![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](https://github.com/mr-shaper/keel-harness/releases)
 
 ![5 vocab + 4 gaps demo](demo/demo-4.gif)
@@ -187,7 +187,7 @@ power user.
 ### Tooling
 
 - `sync.sh` — 5-command sync (init / export / import / diff / release) with 5-layer privacy protection
-- `scripts/sync-self-check.sh` — Cross-platform 5-layer evidence dump. Maintainer reads the dump and self-evaluates sprint outcome (the script never decides outcome itself — P9-doesn't-decide-L4 pattern). Supports `--dry-run`
+- `scripts/sync-self-check.sh` — Cross-platform 5-layer evidence dump. Read-only by design: maintainer reads the dump and self-evaluates sprint outcome (the script never decides outcome itself — P9-doesn't-decide-L4 pattern)
 - `manifest.json` — Kernel file whitelist + private blacklist keywords (what stays in, what never ships)
 - `install.sh` — One-line bootstrap (ships W3)
 - `CHANGELOG.md` — [Keep a Changelog](https://keepachangelog.com/) format, semver tags

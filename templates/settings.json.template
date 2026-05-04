@@ -4,13 +4,13 @@
   "_harness_hooks_count": 9,
 
   "enabledPlugins": {
-    "harness-engineering-plugin@harness-engineering-mp": true
+    "harness-engineering-plugin@keel-harness-mp": true
   },
 
   "extraKnownMarketplaces": {
-    "harness-engineering-mp": {
+    "keel-harness-mp": {
       "source": {
-        "path": "${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}",
+        "path": "${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}",
         "source": "directory"
       }
     }
@@ -21,7 +21,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/stop-handoff-writer.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/stop-handoff-writer.sh",
             "timeout": 120,
             "type": "command"
           }
@@ -34,7 +34,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-handoff-read-gate.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/pre-tool-handoff-read-gate.sh",
             "timeout": 20,
             "type": "command"
           }
@@ -44,7 +44,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-handoff-semantic-gate.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/pre-tool-handoff-semantic-gate.sh",
             "timeout": 20,
             "type": "command"
           }
@@ -54,7 +54,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-doc-sync-sop-enforce.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/pre-tool-doc-sync-sop-enforce.sh",
             "type": "command"
           }
         ],
@@ -63,7 +63,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/pre-tool-plan-quality-gate.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/pre-tool-plan-quality-gate.sh",
             "timeout": 15,
             "type": "command"
           }
@@ -76,7 +76,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/post-tool-chmod-ci-gate.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/post-tool-chmod-ci-gate.sh",
             "timeout": 10,
             "type": "command"
           }
@@ -86,7 +86,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/plugins/compound-selfcheck-plugin/hooks/post-tool-compound-check.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/plugins/compound-selfcheck-plugin/hooks/post-tool-compound-check.sh",
             "timeout": 10,
             "type": "command"
           }
@@ -99,7 +99,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/session-start-layer0-health.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/session-start-layer0-health.sh",
             "timeout": 30,
             "type": "command"
           }
@@ -112,7 +112,7 @@
       {
         "hooks": [
           {
-            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/harness-engineering-mp}/hooks/user-prompt-l42-workflow-trigger-gate.sh",
+            "command": "bash ${HARNESS_HOME:-~/.claude/plugins/keel-harness-mp}/hooks/user-prompt-l42-workflow-trigger-gate.sh",
             "timeout": 10,
             "type": "command"
           }

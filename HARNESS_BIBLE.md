@@ -2,7 +2,7 @@
 
 > **Purpose**: Project-level harness mode contract for keel-harness OSS development sessions.
 > Read on every session start (per ~/.claude/CLAUDE.md §harness mode 触发律 step 2).
-> ZERO Maintainer private content — uses Mr Shaper brand for all maintainer references.
+> ZERO maintainer private content — uses the Mr Shaper brand for all references.
 
 ---
 
@@ -57,7 +57,7 @@ When AI is in this session's harness mode (`.harness/state` present in cwd):
 
 ### 5 必读 (handoff-read-gate enforce):
 1. `.harness/handoff-S<N-1>-to-S<N>.md` (latest, authoritative next_action)
-2. `~/.claude-codepilot/plans/2026-05-01-harness-oss-release-plan-rev-c.md` (Plan rev D + W6/W6.5/W6.6 patches)
+2. `<your-plan-file-path>` (the ratified plan for the current sprint, e.g., `docs/plans/SPRINT_NAME.md`)
 3. `~/.claude/CLAUDE.md` (PUA 10 iron rules + workflow preferences)
 4. `~/dev/harness-engineering/CLAUDE.md` (project contract + roadmap)
 5. **THIS FILE** `~/dev/harness-engineering/HARNESS_BIBLE.md` (project bible)
@@ -102,7 +102,7 @@ Two handoff files coexist; both are authoritative for different purposes:
 - Latest commit: see `git log --oneline -1`
 - 5 test suites: `bash tests/test-{sync,pre-commit,install,red-team,manifest-completeness}.sh`
 - Dogfood verify: `CLAUDE_HOME=/tmp/dogfood-fresh bash install.sh` → Layer 0 5/5
-- KB compound assets: 10+ entries in `iCloud/.../knowledge-base/raw/ai-systems/` (auto-injected on next session via SessionStart wakeup)
+- KB compound assets: 10+ entries in your knowledge-base store (auto-injected on next session via SessionStart wakeup, if your KB toolchain is wired)
 
 ---
 
