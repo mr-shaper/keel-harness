@@ -1,7 +1,7 @@
 # Category H Rule Template — Cross-Sprint Permanent Law
 
 > Category H rules are ratified permanent laws that survive across sessions, sprints, and projects.
-> Once ratified, a Category H rule cannot be revoked without explicit CEO override with documented justification.
+> Once ratified, a Category H rule cannot be revoked without explicit CEO (the human user) override with documented justification. CEO sits above the entire AI hierarchy (P10/P9/P8/P7); P10 is the AI CTO, not the CEO.
 > Use this template when promoting a candidate rule to ratified status.
 
 ---
