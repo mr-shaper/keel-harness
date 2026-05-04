@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# tests/test-pre-commit.sh — TDD 7-case suite for .git/hooks/pre-commit
+# tests/test-pre-commit.sh — TDD 7-case suite for hooks/pre-commit
 # Run from any directory; each case uses an isolated temp git repo.
+# HOOK_SRC reads from tracked `hooks/pre-commit` (CI-friendly), not `.git/hooks/pre-commit`
+# (which is local-only state populated by sync.sh init or manual install).
 
 set -uo pipefail
 
 PASS=0
 FAIL=0
 REAL_REPO="$(cd "$(dirname "$0")/.." && pwd)"
-HOOK_SRC="${REAL_REPO}/.git/hooks/pre-commit"
+HOOK_SRC="${REAL_REPO}/hooks/pre-commit"
 MANIFEST_SRC="${REAL_REPO}/manifest.json"
 
 # ── helpers ──────────────────────────────────────────────────────────────────
