@@ -69,11 +69,14 @@ Four enhancements that strengthen the universal kernel without exposing private 
   to the exemption list (bilingual sibling and retrospective release notes
   legitimately reference brand-sweep terms).
 
-- **`manifest.json`** — `kernel_files` adds eight new entries
+- **`manifest.json`** — `kernel_files` adds seven new entries
   (`README.zh-CN.md`, `CHANGELOG.md` newly registered;
-  `plugins/oodc/skills/oodc/references/create-protocol.md` newly registered;
   `plugins/compound-selfcheck-plugin/{plugin.json,hook.sh,README.md}`;
   `docs/sprint-kickoff-checklist.md`; `scripts/sync-self-check.sh`).
+  An additional positional comma-fix on
+  `plugins/oodc/skills/oodc/references/create-protocol.md` appears in the diff
+  but is not a new registration (it was already in `kernel_files` and only
+  gained a trailing comma when entries were appended after it).
   `private_blacklist_keywords` adds eight scope-forbidden terms
   (`CLAUDE_CONFIG_DIR`, `Maintainer`, `Mobile Documents`, `Mrs-Mac-mini`,
   `Mrs-MacBook-Pro`, `claude-codepilot`, `codepilot`, `dual-runtime`)
