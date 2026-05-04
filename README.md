@@ -12,6 +12,10 @@
 
 > *90 seconds to grok harness. The 4 gaps it fills + the 5 words we want in the agentic engineering vocabulary. Reproduce with `bash demo/record.sh 4`.*
 
+![Phase 0-4 Pipeline + Wave Structure](docs/visuals/pipeline-whiteboard.png)
+
+> *How a single sprint moves through 5 phases × parallel waves, with multi-agent dispatch at every layer.*
+
 ---
 
 ## 30-Second Elevator Pitch
@@ -24,6 +28,8 @@ topology. Apache-2.0. macOS + Linux.
 ---
 
 ## The 4 Gaps It Fills
+
+![4 Gaps + Solutions concept map](docs/visuals/gaps-sketchnote.png)
 
 Most teams hit these walls within weeks of using Claude Code for serious engineering:
 
@@ -210,6 +216,8 @@ Reproduce locally: `brew install asciinema agg && bash demo/record.sh all`
 ---
 
 ## Architecture: 4-Layer Nested Parallel Topology
+
+![4-Layer Nested Parallel Topology infographic](docs/visuals/topology-infograph.png)
 
 ```
 ═══════════════════════════════════════════════════════════════════
