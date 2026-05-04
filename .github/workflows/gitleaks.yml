@@ -21,12 +21,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: detect --source . --verbose --redact
+      - name: Install gitleaks binary
+        run: |
+          GITLEAKS_VERSION="8.24.3"
+          curl -sSL "https://github.com/zricethezav/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tar.gz
+          sudo tar -xz -C /usr/local/bin -f /tmp/gitleaks.tar.gz gitleaks
+          gitleaks version
+
+      - name: Run gitleaks (filesystem scan, --no-git sidesteps first-commit range bug)
+        run: |
+          gitleaks detect \
+            --source . \
+            --no-git \
+            --verbose \
+            --redact \
+            --exit-code 1
 
       - name: Scan summary (success)
         if: success()

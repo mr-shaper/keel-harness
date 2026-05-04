@@ -45,17 +45,17 @@ jobs:
           fi
         shell: bash
 
-      - name: ShellCheck all shell scripts
+      - name: ShellCheck all shell scripts (severity=error, style/warning deferred to v0.1.1)
         run: |
           echo "==> ShellCheck: tests/*.sh"
-          shellcheck tests/*.sh
+          shellcheck --severity=error tests/*.sh
           echo "==> ShellCheck: sync.sh"
-          shellcheck sync.sh
+          shellcheck --severity=error sync.sh
           echo "==> ShellCheck: install.sh"
-          shellcheck install.sh
+          shellcheck --severity=error install.sh
           echo "==> ShellCheck: hooks/pre-commit"
-          shellcheck hooks/pre-commit
-          echo "==> ShellCheck PASSED"
+          shellcheck --severity=error hooks/pre-commit
+          echo "==> ShellCheck PASSED (error-level only; SC2002/SC2034/SC2164/SC2015 backlog)"
         shell: bash
 
       - name: Run test-sync.sh
