@@ -23,7 +23,13 @@
     "LICENSE",
     "templates/CLAUDE.md.global.template",
     "templates/CLAUDE.md.project.template",
-    "templates/settings.json.template"
+    "templates/settings.json.template",
+    "plugins/oodc/plugin.json",
+    "plugins/oodc/skills/oodc/SKILL.md",
+    "plugins/oodc/skills/oodc/references/observe-protocol.md",
+    "plugins/oodc/skills/oodc/references/orient-playbook.md",
+    "plugins/oodc/skills/oodc/references/decide-template.md",
+    "plugins/oodc/skills/oodc/references/create-protocol.md"
   ],
   "manual_sync_files": [
     "templates/CLAUDE.md.global.template",
@@ -35,6 +41,7 @@
     "mrshaper",
     "oss-test-user",
     "OSS_MAINTAINER",
+    "roy2026us",
     "@gmail.com",
     "/Users/mrshaper",
     "example-employer",

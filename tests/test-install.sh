@@ -43,7 +43,7 @@ test_dep_check_jq_present() {
     INSTALL_DRY_RUN=1 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="${ws}/claude-home" \
-    bash "$INSTALL" 2>&1
+    bash "$INSTALL" --skip-deps-check 2>&1
   )
 
   if echo "$output" | grep -q "Dependency check passed"; then
@@ -67,7 +67,7 @@ test_phase1_cp() {
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="$harness_home" \
     CLAUDE_HOME="${ws}/claude-home" \
-    bash "$INSTALL" <<< $'n\nn\n' 2>&1
+    bash "$INSTALL" --skip-deps-check <<< $'n\nn\n' 2>&1
   )
 
   # Verify install.sh itself was copied (it's in manifest.kernel_files and exists)
@@ -108,7 +108,7 @@ test_phase2_claude_md_global_new() {
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
-    bash "$INSTALL" <<< $'n\n' 2>&1
+    bash "$INSTALL" --skip-deps-check <<< $'n\n' 2>&1
   )
 
   if [[ -f "${claude_home}/CLAUDE.md" ]]; then
@@ -135,7 +135,7 @@ test_phase2_claude_md_global_merge() {
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
-    bash "$INSTALL" <<< $'Y\nN\n' 2>&1
+    bash "$INSTALL" --skip-deps-check <<< $'Y\nN\n' 2>&1
   )
 
   if grep -q "harness mode" "${claude_home}/CLAUDE.md" 2>/dev/null; then
@@ -169,7 +169,7 @@ test_phase2_claude_md_global_skip() {
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
-    bash "$INSTALL" <<< $'N\nN\n' 2>&1
+    bash "$INSTALL" --skip-deps-check <<< $'N\nN\n' 2>&1
   )
 
   # CLAUDE.md should NOT contain harness contract
@@ -215,7 +215,7 @@ EOF
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
-    bash "$INSTALL" <<< $'N\nY\n' 2>&1
+    bash "$INSTALL" --skip-deps-check <<< $'N\nY\n' 2>&1
   )
 
   # Check user theme preserved
@@ -252,7 +252,7 @@ test_phase3_settings_new() {
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
-    bash "$INSTALL" <<< $'N\n' 2>&1
+    bash "$INSTALL" --skip-deps-check <<< $'N\n' 2>&1
   )
 
   if [[ -f "${claude_home}/settings.json" ]]; then
@@ -282,7 +282,7 @@ test_phase4_agpl_warn() {
     INSTALL_DRY_RUN=1 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="${ws}/claude-home" \
-    bash "$INSTALL" --with-claude-mem 2>&1
+    bash "$INSTALL" --skip-deps-check --with-claude-mem 2>&1
   )
 
   if echo "$output" | grep -q "AGPL"; then
@@ -321,7 +321,7 @@ test_dry_run_mode() {
     INSTALL_DRY_RUN=1 \
     HARNESS_HOME="$harness_home" \
     CLAUDE_HOME="$claude_home" \
-    bash "$INSTALL" 2>&1
+    bash "$INSTALL" --skip-deps-check 2>&1
   )
 
   # HARNESS_HOME should NOT be created (dry-run)
@@ -361,7 +361,7 @@ test_idempotent() {
   INSTALL_DRY_RUN=0 \
   HARNESS_HOME="$harness_home" \
   CLAUDE_HOME="$claude_home" \
-  bash "$INSTALL" <<< $'N\nN\n' &>/dev/null || true
+  bash "$INSTALL" --skip-deps-check <<< $'N\nN\n' &>/dev/null || true
 
   # Capture install.sh content after first install
   local first_install_hash=""
@@ -375,7 +375,7 @@ test_idempotent() {
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="$harness_home" \
     CLAUDE_HOME="$claude_home" \
-    bash "$INSTALL" <<< $'N\nN\n' 2>&1
+    bash "$INSTALL" --skip-deps-check <<< $'N\nN\n' 2>&1
   ) || true
 
   # Files should still be present (no deletion)

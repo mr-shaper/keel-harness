@@ -1,0 +1,20 @@
+{
+  "name": "oodc",
+  "version": "1.4.0",
+  "description": "OODC cognitive loop (Observe→Orient→Decide→Create) for building high-quality projects and skills. Use when starting novel projects, deep research needed, or user says 'OODC'/'oodc mode'/'全量调研'.",
+  "author": {
+    "name": "mr-shaper",
+    "email": "mr-shaper@noreply.github.com",
+    "url": "https://github.com/mr-shaper/keel-harness"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "oodc",
+    "ooda",
+    "cognitive-loop",
+    "skill-creation",
+    "methodology"
+  ],
+  "homepage": "https://github.com/mr-shaper/keel-harness/tree/main/plugins/oodc",
+  "repository": "https://github.com/mr-shaper/keel-harness"
+}

@@ -4,11 +4,13 @@
 # Local install: bash install.sh [--dry-run] [--with-pua] [--with-claude-mem] [--with-superpowers] [--with-tacit-kb] [--with-docsync] [--help]
 #
 # Phases:
-#   Phase 1: Copy 23 kernel_files from manifest.json → HARNESS_HOME
-#   Phase 2: CLAUDE.md merge (global prompt + project cp)
-#   Phase 3: settings.json jq merge with atomic backup
-#   Phase 4: Optional plugin flags (print URL only, no exec install)
-#   Phase 5: Layer 0 5-element health check
+#   Phase 0.5: Required upstream plugin check (superpowers + PUA, ABORT if missing)
+#   Phase 1:   Copy 29 kernel_files from manifest.json → HARNESS_HOME
+#   Phase 1.5: Install bundled OODC plugin (Apache-2.0) → ~/.claude/plugins/oodc/
+#   Phase 2:   CLAUDE.md merge (global prompt + project cp)
+#   Phase 3:   settings.json jq merge with atomic backup
+#   Phase 4:   Optional plugin flags (claude-mem / tacit-kb / docsync — URL only)
+#   Phase 5:   Layer 0 5-element health check
 #
 # License: MIT (install.sh itself). Components may carry their own licenses.
 # See README.md §License for details.
@@ -32,9 +34,8 @@ dry()     { echo -e "${YELLOW}[DRY-RUN]${NC} would: $*"; }
 
 # ── Flags ─────────────────────────────────────────────────────────────────────
 FLAG_DRY_RUN=0
-FLAG_WITH_PUA=0
+FLAG_SKIP_DEPS_CHECK=0
 FLAG_WITH_CLAUDE_MEM=0
-FLAG_WITH_SUPERPOWERS=0
 FLAG_WITH_TACIT_KB=0
 FLAG_WITH_DOCSYNC=0
 
@@ -47,12 +48,22 @@ Usage: bash install.sh [OPTIONS]
 
 OPTIONS:
   --dry-run           Preview all changes without writing any files
-  --with-pua          Print URL to install PUA plugin (maintainer's private plugin)
+  --skip-deps-check   Skip the required-dependency pre-flight check (dogfood/dev only)
   --with-claude-mem   Print URL to install claude-mem (AGPL-3.0 — your responsibility)
-  --with-superpowers  Print URL to install superpowers plugin (via marketplace)
   --with-tacit-kb     Print URL to install tacit-kb plugin (internal, license unclear)
   --with-docsync      Print URL to install doc-sync plugin (internal, license unclear)
   --help              Show this help message
+
+REQUIRED upstream plugins (auto-detected, install BEFORE running this script):
+  superpowers (MIT, by Jesse Vincent / @obra)
+    claude plugin marketplace add obra/superpowers-marketplace
+    claude plugin install superpowers@superpowers-marketplace
+  PUA (MIT, by 探微安全实验室 / @tanweai)
+    git clone https://github.com/tanweai/pua ~/.claude/plugins/pua
+
+BUNDLED plugin (auto-installed by this script in Phase 1.5):
+  OODC (Apache-2.0, by mr-shaper) — bundled in plugins/oodc/, copied to
+  ~/.claude/plugins/oodc/ during install.
 
 ENVIRONMENT:
   INSTALL_DRY_RUN=1   Same as --dry-run
@@ -60,11 +71,13 @@ ENVIRONMENT:
   CLAUDE_HOME         Claude config dir (default: ~/.claude)
 
 PHASES:
-  Phase 1: Copy 23 kernel files from manifest.json → HARNESS_HOME
-  Phase 2: CLAUDE.md merge (global prompt + project template cp)
-  Phase 3: settings.json jq merge with atomic backup + dry-run diff
-  Phase 4: Optional plugin flags (URL only, no exec install)
-  Phase 5: Layer 0 5-element health check (verify install integrity)
+  Phase 0.5: Required upstream plugin check (superpowers + PUA, ABORT if missing)
+  Phase 1:   Copy 29 kernel files from manifest.json → HARNESS_HOME
+  Phase 1.5: Install bundled OODC plugin → ~/.claude/plugins/oodc/
+  Phase 2:   CLAUDE.md merge (global prompt + project template cp)
+  Phase 3:   settings.json jq merge with atomic backup + dry-run diff
+  Phase 4:   Optional plugin flags (claude-mem / tacit-kb / docsync — URL only)
+  Phase 5:   Layer 0 5-element health check (verify install integrity)
 
 IDEMPOTENT: Safe to re-run. Detects existing install via manifest hash comparison.
 
@@ -75,9 +88,8 @@ EOF
 for arg in "$@"; do
   case "$arg" in
     --dry-run)          FLAG_DRY_RUN=1 ;;
-    --with-pua)         FLAG_WITH_PUA=1 ;;
+    --skip-deps-check)  FLAG_SKIP_DEPS_CHECK=1 ;;
     --with-claude-mem)  FLAG_WITH_CLAUDE_MEM=1 ;;
-    --with-superpowers) FLAG_WITH_SUPERPOWERS=1 ;;
     --with-tacit-kb)    FLAG_WITH_TACIT_KB=1 ;;
     --with-docsync)     FLAG_WITH_DOCSYNC=1 ;;
     --help|-h)          usage; exit 0 ;;
@@ -128,6 +140,81 @@ check_deps() {
   success "Dependency check passed"
 }
 
+# ── Phase 0.5: Required upstream plugin check (superpowers + PUA) ────────────
+# These two are MIT-licensed OSS plugins that harness workflow MDs reference at
+# runtime. Without them, Skill tool calls in Read PUA/superpowers/* will fail.
+phase0_required_deps_check() {
+  info "Phase 0.5: Required upstream plugin check (superpowers + PUA)"
+
+  local missing=()
+
+  # superpowers detection: marketplace cache OR direct install
+  if [[ ! -d "${CLAUDE_HOME}/plugins/cache/superpowers-marketplace" ]] && \
+     [[ ! -d "${CLAUDE_HOME}/plugins/marketplaces/superpowers-marketplace" ]] && \
+     [[ ! -d "${CLAUDE_HOME}/plugins/superpowers" ]]; then
+    missing+=("superpowers")
+  fi
+
+  # PUA detection: direct install OR marketplace cache
+  if [[ ! -f "${CLAUDE_HOME}/plugins/pua/plugin.json" ]] && \
+     [[ ! -d "${CLAUDE_HOME}/plugins/cache/pua-skills" ]]; then
+    missing+=("pua")
+  fi
+
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    success "  Phase 0.5: superpowers + PUA detected"
+    return 0
+  fi
+
+  echo ""
+  echo -e "${RED}═══════════════════════════════════════════════════════════════════${NC}"
+  echo -e "${RED}  REQUIRED DEPENDENCIES MISSING${NC}"
+  echo -e "${RED}═══════════════════════════════════════════════════════════════════${NC}"
+  echo ""
+  echo "  harness-engineering depends on TWO upstream OSS plugins (MIT)."
+  echo "  Without them, workflow MDs reference Skill protocols that cannot load."
+  echo ""
+
+  local m
+  for m in "${missing[@]}"; do
+    case "$m" in
+      superpowers)
+        echo -e "${YELLOW}  [MISSING] superpowers (MIT, by Jesse Vincent / @obra)${NC}"
+        echo "    Provides: writing-plans, dispatching-parallel-agents, TDD,"
+        echo "              verification-before-completion, brainstorming,"
+        echo "              executing-plans, subagent-driven-development."
+        echo "    Install:"
+        echo "      claude plugin marketplace add obra/superpowers-marketplace"
+        echo "      claude plugin install superpowers@superpowers-marketplace"
+        echo "    Repo: https://github.com/obra/superpowers"
+        echo ""
+        ;;
+      pua)
+        echo -e "${YELLOW}  [MISSING] PUA (MIT, by 探微安全实验室 / @tanweai)${NC}"
+        echo "    Provides: P10/P9/P8/P7 role protocols, red-line enforcement,"
+        echo "              Romeo evaluator, parallel agent topology."
+        echo "    Install:"
+        echo "      git clone https://github.com/tanweai/pua \\"
+        echo "        ~/.claude/plugins/pua"
+        echo "    Repo: https://github.com/tanweai/pua"
+        echo ""
+        ;;
+    esac
+  done
+
+  echo -e "${RED}  Re-run install.sh after installing the above.${NC}"
+  echo "  (Use --skip-deps-check ONLY for development/dogfood.)"
+  echo ""
+
+  if [[ "$FLAG_SKIP_DEPS_CHECK" == "1" ]]; then
+    warn "  --skip-deps-check provided. Continuing without required deps."
+    warn "  harness will install but workflow MDs reference missing skills."
+    return 0
+  fi
+
+  exit 2
+}
+
 # ── Phase 1: Copy kernel files ────────────────────────────────────────────────
 phase1_copy_kernel_files() {
   info "Phase 1: Copying kernel files → ${HARNESS_HOME}"
@@ -171,6 +258,38 @@ phase1_copy_kernel_files() {
   done <<< "$kernel_files"
 
   success "Phase 1 complete: ${copied} kernel files copied to ${HARNESS_HOME}"
+}
+
+# ── Phase 1.5: Install bundled OODC plugin ────────────────────────────────────
+# OODC plugin is shipped inside this repo at plugins/oodc/. Phase 1.5 copies it
+# to ~/.claude/plugins/oodc/ so Claude Code can discover and load it.
+phase1_5_install_bundled_plugins() {
+  info "Phase 1.5: Install bundled OODC plugin"
+
+  local oodc_src="${REPO_ROOT}/plugins/oodc"
+  local oodc_dst="${CLAUDE_HOME}/plugins/oodc"
+
+  if [[ ! -d "$oodc_src" ]]; then
+    warn "Bundled OODC source not found at ${oodc_src} — skipping"
+    return 0
+  fi
+
+  if [[ "$DRY_RUN" == "1" ]]; then
+    dry "mkdir -p ${oodc_dst}"
+    dry "cp -R ${oodc_src}/* ${oodc_dst}/"
+    success "Phase 1.5 (dry-run): would install bundled OODC to ${oodc_dst}"
+    return 0
+  fi
+
+  if [[ -d "$oodc_dst" ]] && [[ -f "$oodc_dst/plugin.json" ]]; then
+    warn "  ~/.claude/plugins/oodc/ already exists — backing up to oodc.bak.$(date +%s)"
+    mv "$oodc_dst" "${oodc_dst}.bak.$(date +%s)"
+  fi
+
+  mkdir -p "$oodc_dst"
+  cp -R "$oodc_src"/* "$oodc_dst/"
+
+  success "Phase 1.5 complete: OODC v$(jq -r '.version' "$oodc_dst/plugin.json") installed to ${oodc_dst}"
 }
 
 # ── Phase 2: CLAUDE.md merge ──────────────────────────────────────────────────
@@ -363,26 +482,10 @@ phase3_settings_json() {
 }
 
 # ── Phase 4: Optional plugin flags ───────────────────────────────────────────
+# Note: superpowers + PUA moved to Phase 0.5 (REQUIRED). OODC moved to Phase 1.5
+# (BUNDLED, auto-installed). Phase 4 only handles 3 truly-optional plugins.
 phase4_optional_plugins() {
   local any=0
-
-  if [[ "$FLAG_WITH_SUPERPOWERS" == "1" ]]; then
-    any=1
-    info "Phase 4: --with-superpowers"
-    echo "  Install superpowers via the Claude Code marketplace:"
-    echo "  > claude plugin install superpowers"
-    echo "  (Do NOT use this install.sh to exec that command — install manually)"
-    echo ""
-  fi
-
-  if [[ "$FLAG_WITH_PUA" == "1" ]]; then
-    any=1
-    info "Phase 4: --with-pua"
-    echo "  PUA is a private plugin (the maintainer's personal system)."
-    echo "  Visit: https://github.com/mr-shaper/pua-plugin (if public)"
-    echo "  Install manually per its README. We do NOT install it for you."
-    echo ""
-  fi
 
   if [[ "$FLAG_WITH_CLAUDE_MEM" == "1" ]]; then
     any=1
@@ -519,7 +622,11 @@ main() {
 
   check_deps
   echo ""
+  phase0_required_deps_check
+  echo ""
   phase1_copy_kernel_files
+  echo ""
+  phase1_5_install_bundled_plugins
   echo ""
   phase2_claude_md
   echo ""

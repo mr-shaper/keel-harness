@@ -46,15 +46,72 @@ Most teams hit these walls within weeks of using Claude Code for serious enginee
 
 ---
 
+## Required Dependencies (install BEFORE running install.sh)
+
+keel-harness is the **kernel + workflow MDs**. The runtime protocols its
+workflow MDs reference live in two upstream OSS plugins. Both are MIT-licensed
+and Apache-2.0 compatible. **harness will not function without these.**
+
+`install.sh` Phase 0.5 detects both and ABORTS if either is missing.
+
+### 1. superpowers (MIT, Jesse Vincent / @obra)
+
+Provides: `writing-plans`, `dispatching-parallel-agents`, `test-driven-development`,
+`verification-before-completion`, `brainstorming`, `executing-plans`,
+`subagent-driven-development`.
+
+```bash
+claude plugin marketplace add obra/superpowers-marketplace
+claude plugin install superpowers@superpowers-marketplace
+```
+
+Repo: https://github.com/obra/superpowers · License: MIT · Version tested: 5.0.7
+
+### 2. PUA (MIT, 探微安全实验室 / @tanweai)
+
+Provides: P10/P9/P8/P7 role protocols, red-line enforcement, Romeo evaluator,
+parallel agent topology, performance pressure escalation.
+
+```bash
+git clone https://github.com/tanweai/pua ~/.claude/plugins/pua
+```
+
+Repo: https://github.com/tanweai/pua · License: MIT · Version tested: 3.0.0
+
+### Verification
+
+```bash
+ls ~/.claude/plugins/pua/plugin.json   # PUA installed
+ls -d ~/.claude/plugins/cache/superpowers-marketplace 2>/dev/null \
+  || ls -d ~/.claude/plugins/marketplaces/superpowers-marketplace
+```
+
+If either path is missing, `bash install.sh` will exit 2 with install
+instructions printed inline. Use `--skip-deps-check` ONLY for
+development/dogfood.
+
+---
+
+## Bundled Plugins (auto-installed by install.sh)
+
+These ship inside `plugins/` and get copied to `~/.claude/plugins/<name>/`
+during Phase 1.5. No separate download.
+
+| Plugin | License | What it provides |
+|---|---|---|
+| **OODC** v1.4.0 | Apache-2.0 (by mr-shaper) | Cognitive loop: Observe → Orient → Decide → Create. 4 reference protocols. Used by `workflows/oodc-superpower-harness-orchestration.md` |
+
+---
+
 ## Quickstart (5 min)
 
-> **Note**: `install.sh` ships in W3 (see roadmap). The one-liner below will work when W3 lands.
+> **Prerequisites**: superpowers + PUA installed (see Required Dependencies above).
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/mr-shaper/keel-harness/main/install.sh | bash
 ```
 
-Until then, manual bootstrap:
+Until you have the one-liner cached, manual bootstrap:
 
 ```bash
 # Step 1: Clone the kernel
@@ -209,38 +266,21 @@ Workflow MDs ship as part of the kernel. English versions land in W2:
 
 ---
 
-## Optional Integrations
+## Optional Integrations (advanced)
 
-harness-engineering is the kernel. These are optional layers you can add on top:
-
-### superpowers (recommended)
-
-The `superpowers` plugin by Jesse Vincent provides the Skill system that harness workflow MDs
-reference. Install separately:
-
-```bash
-claude plugin install superpowers
-# or: see https://github.com/jessevictoria/superpowers
-```
-
-When installing harness with install.sh, pass `--with-superpowers` to auto-install.
-
-### Maintainer's Private Plugins (optional, advanced)
-
-The following plugins are referenced in harness workflow MDs and available from their respective
-repositories. They are **not bundled** with harness-engineering and are **not auto-installed**.
-Review each project's license before use — license compatibility with Apache-2.0 is your
+The two REQUIRED plugins (superpowers + PUA) and the BUNDLED plugin (OODC) are
+covered above. Below are three additional plugins referenced indirectly by
+harness workflow MDs. They are **not bundled** and **not auto-installed**.
+Review each project's license before use — Apache-2.0 compatibility is your
 responsibility.
 
-- **PUA** (`--with-pua`): Performance Under Accountability — P10-9-8-7 topology enforcement +
-  Romeo 6-dim scoring. Visit the PUA repo for installation.
-- **claude-mem** (`--with-claude-mem`): Persistent semantic memory across sessions.
-- **tacit-kb** (`--with-tacit-kb`): Tacit knowledge base — Compound Engineering pipeline
-  (decisions / exemplars / analogies / evolution).
-- **doc-sync** (`--with-doc-sync`): Document synchronization + knowledge base ingestion routing.
+- **claude-mem** (`--with-claude-mem`): Persistent semantic memory across sessions. **AGPL-3.0** — strong copyleft, your responsibility to comply.
+- **tacit-kb** (`--with-tacit-kb`): Tacit knowledge base — Compound Engineering pipeline (decisions / exemplars / analogies / evolution). License unclear — verify before use.
+- **doc-sync** (`--with-docsync`): Document synchronization + knowledge base ingestion routing. License unclear — verify before use.
 
-> These plugins were built for a specific engineering context. They work best when you understand
-> the harness topology first. Start with the kernel, add plugins when you feel the gap.
+> These plugins were built for a specific engineering context. They work best
+> when you already understand the harness topology. Start with the
+> required + bundled, add these only when you feel the gap.
 
 ---
 
