@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Kalam:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #E8EAF0;
+    --board: #F3F4F7;
+    --ink: #2C2826;
+    --ink-light: #8A8478;
+    --red: #A09888;
+    --blue: #7A8A98;
+    --green: #7A8A7A;
+    --yellow: #5A6878;
+    --orange: #907A60;
+    --shu: #C03C28;
+    --marker-bg: rgba(44, 40, 38, 0.04);
+    --hand: 'Kalam', system-ui, cursive;
+    --marker: 'Permanent Marker', system-ui, cursive;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --mono: 'SF Mono', 'Menlo', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; background: var(--bg); }
+
+  .board-frame {
+    width: 1080px;
+    padding: 1px;
+    background: rgba(160,170,190,0.12);
+    border-radius: 2px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.20);
+    position: relative;
+  }
+
+  .board {
+    width: 100%;
+    background: var(--board);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .board > .surface {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 25% 20%, rgba(120,140,170,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 75% 55%, rgba(150,165,190,0.03) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .colophon {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 56px 32px;
+    border-top: 1px solid rgba(150,165,190,0.12);
+  }
+
+  .colophon .info-source {
+    font: 400 20px/1 var(--mono);
+    color: var(--ink-light);
+    letter-spacing: 0.01em;
+  }
+
+  /* ─── Custom CSS ─── */
+
+  /* ── Title area ── */
+  .board-title {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 64px 56px 20px;
+  }
+
+  .board-title-sub {
+    font: 400 28px/1.4 var(--hand);
+    color: var(--ink-light);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .board-title-main {
+    font: 700 66px/1.15 var(--marker);
+    color: var(--ink);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .board-title-main .y {
+    color: var(--yellow);
+  }
+
+  .title-line {
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* ── Content body ── */
+  .body {
+    position: relative;
+    z-index: 2;
+    padding: 36px 72px 20px;
+  }
+
+  /* ── Section label (chapter marker) ── */
+  .section-label {
+    font: 700 22px/1 var(--sans);
+    color: var(--ink-light);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    opacity: 0.7;
+  }
+
+  /* ── Wave sidebar strip ── */
+  .wave-sidebar {
+    position: relative;
+    z-index: 2;
+    padding: 0 72px 10px;
+  }
+
+  /* ── Phase chain: each phase is a row ── */
+  .phase-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .phase-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+  }
+
+  /* Phase badge */
+  .phase-badge {
+    flex-shrink: 0;
+    width: 112px;
+    padding: 10px 0 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .phase-num {
+    font: 700 13px/1 var(--sans);
+    color: var(--ink-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .phase-name {
+    font: 700 30px/1.1 var(--marker);
+    color: var(--yellow);
+    letter-spacing: 0.01em;
+  }
+
+  /* Connector arrow between badge and content */
+  .phase-arrow-wrap {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    margin-top: 16px;
+  }
+
+  /* Phase content box */
+  .phase-content {
+    flex: 1;
+    padding: 14px 20px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .phase-headline {
+    font: 700 34px/1.3 var(--hand);
+    color: var(--ink);
+  }
+
+  .phase-headline .y { color: var(--yellow); }
+  .phase-headline .r { color: var(--shu); }
+
+  .phase-detail {
+    font: 400 25px/1.55 var(--hand);
+    color: var(--ink-light);
+  }
+
+  .phase-detail .kw {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .phase-detail .y {
+    color: var(--yellow);
+    font-weight: 700;
+  }
+
+  /* Vertical connector between rows */
+  .row-connector {
+    display: flex;
+    align-items: center;
+    padding: 4px 0 4px 52px;
+  }
+
+  /* ── Inline chain arrow ── */
+  .chain-arrow {
+    color: var(--red);
+    font: 700 30px var(--hand);
+    margin: 0 6px;
+    display: inline;
+  }
+
+  /* ── Chalk styling helpers ── */
+  .chalk-yellow { color: var(--yellow); font-weight: 700; }
+  .chalk-shu    { color: var(--shu); font-weight: 700; }
+  .chalk-ink    { color: var(--ink); font-weight: 700; }
+
+  .chalk-circled {
+    border: 2.5px solid var(--yellow);
+    border-radius: 45% 55% 50% 48%;
+    padding: 1px 12px;
+    display: inline-block;
+    line-height: 1.4;
+  }
+
+  .chalk-box-shu {
+    border: 2.5px solid var(--shu);
+    border-radius: 3px;
+    padding: 12px 18px;
+    display: inline-block;
+  }
+
+  .shu-stamp {
+    display: inline-block;
+    border: 2px solid var(--shu);
+    padding: 3px 10px;
+    font: 700 18px var(--hand);
+    color: var(--shu);
+    transform: rotate(-2deg);
+    opacity: 0.65;
+    vertical-align: middle;
+    margin-left: 10px;
+  }
+
+  /* ── Divider (wave) ── */
+  .chalk-wave {
+    display: block;
+    margin: 16px auto;
+    opacity: 0.12;
+  }
+
+  /* ── Wave strip ── */
+  .wave-strip {
+    position: relative;
+    z-index: 2;
+    padding: 24px 72px 20px;
+  }
+
+  .wave-strip-title {
+    font: 700 22px/1 var(--sans);
+    color: var(--ink-light);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+
+  .wave-flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 4px;
+  }
+
+  .wave-node {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .wave-name {
+    font: 700 26px/1 var(--hand);
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .wave-agents {
+    font: 400 20px/1 var(--hand);
+    color: var(--ink-light);
+    white-space: nowrap;
+  }
+
+  .wave-sep {
+    color: var(--red);
+    font: 700 28px var(--hand);
+    margin: 0 2px;
+    padding-bottom: 14px;
+  }
+
+  /* ── Speedup callout ── */
+  .speedup-callout {
+    position: relative;
+    z-index: 2;
+    padding: 8px 72px 36px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .speedup-num {
+    font: 700 86px/1 var(--marker);
+    color: var(--yellow);
+    flex-shrink: 0;
+  }
+
+  .speedup-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .speedup-main {
+    font: 700 34px/1.2 var(--hand);
+    color: var(--ink);
+  }
+
+  .speedup-sub {
+    font: 400 24px/1.4 var(--hand);
+    color: var(--ink-light);
+  }
+
+  .speedup-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* ── Phase row border-left accent ── */
+  .phase-row-wrap {
+    border-left: 3px solid rgba(90,104,120,0.18);
+    padding-left: 18px;
+    margin-left: 4px;
+  }
+
+  /* ── SVG icon helpers ── */
+  .icon-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <marker id="arrow-r" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="var(--red)" />
+    </marker>
+    <marker id="arrow-b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="var(--blue)" />
+    </marker>
+    <marker id="arrow-w" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="var(--ink)" />
+    </marker>
+    <marker id="arrow-g" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="var(--green)" />
+    </marker>
+    <marker id="arrow-y" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="var(--yellow)" />
+    </marker>
+    <marker id="arrow-s" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="var(--shu)" />
+    </marker>
+  </defs>
+</svg>
+
+<div class="board-frame">
+<div class="board">
+  <div class="surface"></div>
+
+  <!-- ── TITLE ── -->
+  <div class="board-title">
+    <div class="board-title-sub">keel-harness · engineering methodology</div>
+    <h1 class="board-title-main">How harness <span class="y">ships</span></h1>
+    <svg class="title-line" width="640" height="10">
+      <path d="M0,5 Q160,1 320,5 T640,5" stroke="var(--yellow)" fill="none" stroke-width="2.5" opacity="0.35"/>
+    </svg>
+    <div style="margin-top:10px; font:400 28px/1.4 var(--hand); color:var(--ink-light);">
+      5 phases &nbsp;×&nbsp; 5 waves &nbsp;·&nbsp; parallel agents at every layer
+    </div>
+  </div>
+
+  <!-- ── PHASE CHAIN ── -->
+  <div class="body">
+    <div class="section-label">Pipeline · Phase 0 → 4</div>
+
+    <div class="phase-chain">
+
+      <!-- Phase 0 -->
+      <div class="phase-row">
+        <div class="phase-badge">
+          <span class="phase-num">Phase 0</span>
+          <span class="phase-name">Kickoff</span>
+        </div>
+        <div class="phase-arrow-wrap">
+          <svg width="36" height="22">
+            <line x1="0" y1="11" x2="28" y2="11" stroke="var(--red)" stroke-width="2" marker-end="url(#arrow-r)"/>
+          </svg>
+        </div>
+        <div class="phase-content">
+          <div class="phase-headline">
+            <span class="chalk-circled">5-element</span> project setup
+            <span class="chain-arrow">→</span>
+            read <span class="y">5 files</span>
+            <span class="chain-arrow">→</span>
+            answer <span class="y">5 self-checks</span>
+          </div>
+          <div class="phase-detail">
+            <!-- icon: checklist -->
+            <svg class="icon-inline" width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="3" y="3" width="22" height="22" rx="2" stroke="var(--ink)" stroke-width="2"/>
+              <path d="M8 10 L12 14 L20 7" stroke="var(--yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="8" y1="18" x2="20" y2="18" stroke="var(--ink-light)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="kw">harness mode gate</span> — identity · next_action · ratified plan · handoff · stage
+          </div>
+        </div>
+      </div>
+
+      <!-- connector -->
+      <div class="row-connector">
+        <svg width="22" height="30">
+          <line x1="11" y1="0" x2="11" y2="24" stroke="var(--red)" stroke-width="1.8" marker-end="url(#arrow-r)" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+
+      <!-- Phase 1 -->
+      <div class="phase-row">
+        <div class="phase-badge">
+          <span class="phase-num">Phase 1</span>
+          <span class="phase-name">Explore</span>
+        </div>
+        <div class="phase-arrow-wrap">
+          <svg width="36" height="22">
+            <line x1="0" y1="11" x2="28" y2="11" stroke="var(--red)" stroke-width="2" marker-end="url(#arrow-r)"/>
+          </svg>
+        </div>
+        <div class="phase-content">
+          <div class="phase-headline">
+            Spawn <span class="y">3+ P8 agents</span>
+            <span class="chain-arrow">→</span>
+            Wave-O OODC Observe
+            <span class="chain-arrow">→</span>
+            <span class="r">true parallel</span>
+          </div>
+          <div class="phase-detail">
+            <!-- icon: parallel branches -->
+            <svg class="icon-inline" width="32" height="28" viewBox="0 0 32 28" fill="none">
+              <circle cx="6" cy="14" r="3" stroke="var(--ink)" stroke-width="2"/>
+              <line x1="9" y1="14" x2="14" y2="7" stroke="var(--ink)" stroke-width="1.8"/>
+              <line x1="9" y1="14" x2="14" y2="14" stroke="var(--ink)" stroke-width="1.8"/>
+              <line x1="9" y1="14" x2="14" y2="21" stroke="var(--ink)" stroke-width="1.8"/>
+              <circle cx="18" cy="7" r="3" stroke="var(--yellow)" stroke-width="2"/>
+              <circle cx="18" cy="14" r="3" stroke="var(--yellow)" stroke-width="2"/>
+              <circle cx="18" cy="21" r="3" stroke="var(--yellow)" stroke-width="2"/>
+            </svg>
+            each P8 scans a <span class="kw">different domain</span> — no sequential bottleneck, no waiting
+          </div>
+        </div>
+      </div>
+
+      <!-- connector -->
+      <div class="row-connector">
+        <svg width="22" height="30">
+          <line x1="11" y1="0" x2="11" y2="24" stroke="var(--red)" stroke-width="1.8" marker-end="url(#arrow-r)" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="phase-row">
+        <div class="phase-badge">
+          <span class="phase-num">Phase 2</span>
+          <span class="phase-name">Decide</span>
+        </div>
+        <div class="phase-arrow-wrap">
+          <svg width="36" height="22">
+            <line x1="0" y1="11" x2="28" y2="11" stroke="var(--red)" stroke-width="2" marker-end="url(#arrow-r)"/>
+          </svg>
+        </div>
+        <div class="phase-content">
+          <div class="phase-headline">
+            P10 ratifies scope
+            <span class="chain-arrow">→</span>
+            P9 writes <span class="y">Task Prompts</span>
+            <span class="chain-arrow">→</span>
+            <span class="y">six elements</span>
+          </div>
+          <div class="phase-detail">
+            <!-- icon: decision fork -->
+            <svg class="icon-inline" width="30" height="28" viewBox="0 0 30 28" fill="none">
+              <path d="M5 22 Q10 14 15 10" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+              <path d="M15 10 Q20 5 26 6" stroke="var(--yellow)" stroke-width="2" stroke-linecap="round"/>
+              <path d="M15 10 Q18 16 25 22" stroke="var(--ink-light)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 2"/>
+              <circle cx="15" cy="10" r="2.5" stroke="var(--shu)" stroke-width="2" fill="none"/>
+            </svg>
+            convergence — P10 &ne; P9 roles strictly isolated · <span class="kw">strategic boundary</span> enforced
+          </div>
+        </div>
+      </div>
+
+      <!-- connector -->
+      <div class="row-connector">
+        <svg width="22" height="30">
+          <line x1="11" y1="0" x2="11" y2="24" stroke="var(--red)" stroke-width="1.8" marker-end="url(#arrow-r)" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="phase-row">
+        <div class="phase-badge">
+          <span class="phase-num">Phase 3</span>
+          <span class="phase-name">Ship</span>
+        </div>
+        <div class="phase-arrow-wrap">
+          <svg width="36" height="22">
+            <line x1="0" y1="11" x2="28" y2="11" stroke="var(--red)" stroke-width="2" marker-end="url(#arrow-r)"/>
+          </svg>
+        </div>
+        <div class="phase-content">
+          <div class="phase-headline">
+            Multiple <span class="y">P8 true-parallel</span>
+            <span class="chain-arrow">→</span>
+            file-domain isolated
+            <span class="chain-arrow">→</span>
+            grep verify
+          </div>
+          <div class="phase-detail">
+            <!-- icon: multiple workers -->
+            <svg class="icon-inline" width="36" height="28" viewBox="0 0 36 28" fill="none">
+              <circle cx="7" cy="8" r="4" stroke="var(--ink)" stroke-width="1.8"/>
+              <path d="M3 17 Q7 13 11 17 L11 26 L3 26 Z" stroke="var(--ink)" stroke-width="1.8" fill="none"/>
+              <circle cx="19" cy="8" r="4" stroke="var(--yellow)" stroke-width="1.8"/>
+              <path d="M15 17 Q19 13 23 17 L23 26 L15 26 Z" stroke="var(--yellow)" stroke-width="1.8" fill="none"/>
+              <circle cx="31" cy="8" r="4" stroke="var(--ink-light)" stroke-width="1.8"/>
+              <path d="M27 17 Q31 13 35 17 L35 26 L27 26 Z" stroke="var(--ink-light)" stroke-width="1.8" fill="none"/>
+            </svg>
+            each P8 owns a <span class="kw">non-overlapping file domain</span> — no merge conflicts, no waiting
+          </div>
+        </div>
+      </div>
+
+      <!-- connector -->
+      <div class="row-connector">
+        <svg width="22" height="30">
+          <line x1="11" y1="0" x2="11" y2="24" stroke="var(--red)" stroke-width="1.8" marker-end="url(#arrow-r)" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="phase-row">
+        <div class="phase-badge">
+          <span class="phase-num">Phase 4</span>
+          <span class="phase-name">Close</span>
+        </div>
+        <div class="phase-arrow-wrap">
+          <svg width="36" height="22">
+            <line x1="0" y1="11" x2="28" y2="11" stroke="var(--red)" stroke-width="2" marker-end="url(#arrow-r)"/>
+          </svg>
+        </div>
+        <div class="phase-content">
+          <div class="phase-headline">
+            Wave-Doc
+            <span class="chain-arrow">→</span>
+            Wave-G push
+            <span class="chain-arrow">→</span>
+            <span class="r">Romeo audit</span>
+            <span class="chain-arrow">→</span>
+            Stop hook handoff
+          </div>
+          <div class="phase-detail">
+            <!-- icon: checkmark seal -->
+            <svg class="icon-inline" width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <circle cx="14" cy="14" r="11" stroke="var(--shu)" stroke-width="2"/>
+              <path d="M8 14 L12 18 L20 10" stroke="var(--shu)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="kw">handoff-sN.md</span> written · next session reads it · cross-session continuity guaranteed
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.phase-chain -->
+  </div><!-- /.body -->
+
+  <!-- ── WAVE DIVIDER ── -->
+  <svg class="chalk-wave" width="900" height="10" style="display:block;margin:8px auto;">
+    <path d="M0,5 Q112,1 225,5 T450,5 T675,5 T900,5" stroke="var(--ink)" fill="none" stroke-width="1.5"/>
+  </svg>
+
+  <!-- ── WAVE SEQUENCE ── -->
+  <div class="wave-strip">
+    <div class="wave-strip-title">S3-OSS-iter · Wave Sequence</div>
+    <div class="wave-flow">
+
+      <div class="wave-node">
+        <span class="wave-name">Wave-O</span>
+        <span class="wave-agents">3 P8 · Observe</span>
+      </div>
+      <span class="wave-sep">→</span>
+
+      <div class="wave-node">
+        <span class="wave-name">Wave-P10</span>
+        <span class="wave-agents">ratify scope</span>
+      </div>
+      <span class="wave-sep">→</span>
+
+      <div class="wave-node">
+        <span class="wave-name">Wave-D</span>
+        <span class="wave-agents">plan + gate</span>
+      </div>
+      <span class="wave-sep">→</span>
+
+      <div class="wave-node">
+        <span class="wave-name" style="color:var(--yellow)">Wave-C</span>
+        <span class="wave-agents">4 P8 · ship</span>
+      </div>
+      <span class="wave-sep">→</span>
+
+      <div class="wave-node">
+        <span class="wave-name">Wave-Doc</span>
+        <span class="wave-agents">docs + KB</span>
+      </div>
+      <span class="wave-sep">→</span>
+
+      <div class="wave-node">
+        <span class="wave-name">Wave-G</span>
+        <span class="wave-agents">git push</span>
+      </div>
+      <span class="wave-sep">→</span>
+
+      <div class="wave-node">
+        <span class="wave-name" style="color:var(--yellow)">Wave-V</span>
+        <span class="wave-agents">3 P8 · visuals</span>
+      </div>
+      <span class="wave-sep">→</span>
+
+      <div class="wave-node">
+        <span class="wave-name" style="color:var(--shu)">Wave-R</span>
+        <span class="wave-agents">Romeo audit</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SPEEDUP CALLOUT ── -->
+  <div class="speedup-callout">
+    <div class="speedup-num">3.5×</div>
+    <div class="speedup-label">
+      <div class="speedup-main">speedup from true parallelism</div>
+      <div class="speedup-sub">25 min parallel &nbsp;vs&nbsp; 90 min sequential &nbsp;·&nbsp; same output quality</div>
+    </div>
+    <div class="speedup-badge">
+      <div class="chalk-box-shu" style="text-align:center; padding:10px 20px;">
+        <div style="font:700 22px/1.2 var(--hand); color:var(--ink);">P9 <span style="color:var(--red)">→</span> P8 <span style="color:var(--red)">→</span> P7</div>
+        <div style="font:400 19px/1.4 var(--hand); color:var(--ink-light); margin-top:4px;">topology · no P9 codes</div>
+      </div>
+      <div class="shu-stamp">ship</div>
+    </div>
+  </div>
+
+  <!-- ── COLOPHON ── -->
+  <div class="colophon">
+    <div></div>
+    <span class="info-source">keel-harness · github.com/mr-shaper/keel-harness · Apache-2.0</span>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #F0F3F7;
+    --green: #7A9DB8;
+    --pink: #1A936F;
+    --yellow: #FFF200;
+    --ink: #1E2832;
+    --ink-light: #4A5568;
+    --white: #FFFFFF;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', -apple-system, system-ui, sans-serif;
+    --mono: 'SF Mono', 'Menlo', 'Courier New', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; background: var(--bg); }
+
+  .page {
+    width: 1080px;
+    background: var(--bg);
+    position: relative;
+  }
+
+  .page > .grain {
+    position: absolute;
+    inset: 0;
+    filter: url(#noise);
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .colophon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 60px 36px;
+    border-top: 1px solid rgba(30,40,50,0.10);
+  }
+
+  .colophon .who {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .colophon .who span {
+    font: 400 21px/1 var(--mono);
+    color: var(--ink-light);
+    letter-spacing: -0.01em;
+  }
+
+  .colophon .info-source {
+    font: 400 21px/1 var(--mono);
+    color: var(--ink-light);
+  }
+
+  /* ── TOPOLOGY INFOGRAPH ─────────────────────── */
+
+  .topo-wrap {
+    padding: 56px 60px 40px;
+  }
+
+  /* Header band */
+  .topo-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    margin-bottom: 48px;
+  }
+
+  .topo-title {
+    font: 700 92px/0.9 var(--sans);
+    color: var(--ink);
+    letter-spacing: -0.04em;
+  }
+
+  .topo-title em {
+    font-style: normal;
+    color: var(--green);
+  }
+
+  .topo-header-right {
+    text-align: right;
+    padding-bottom: 8px;
+  }
+
+  .topo-ref {
+    font: 400 20px/1 var(--mono);
+    color: var(--ink-light);
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+
+  .topo-subtitle {
+    font: 500 26px/1.3 var(--sans);
+    color: var(--ink-light);
+    max-width: 340px;
+    text-align: right;
+  }
+
+  /* Key metric banner */
+  .topo-metric-band {
+    background: var(--ink);
+    color: var(--white);
+    padding: 22px 40px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 36px;
+    border-radius: 4px;
+  }
+
+  .topo-metric-number {
+    font: 700 72px/1 var(--mono);
+    color: var(--pink);
+    letter-spacing: -0.04em;
+    flex-shrink: 0;
+  }
+
+  .topo-metric-divider {
+    width: 1px;
+    height: 56px;
+    background: rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+
+  .topo-metric-desc {
+    font: 400 28px/1.4 var(--sans);
+    color: rgba(255,255,255,0.85);
+    flex: 1;
+  }
+
+  .topo-metric-desc strong {
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .topo-metric-badge {
+    font: 500 19px/1 var(--mono);
+    color: rgba(255,255,255,0.45);
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+
+  /* Pyramid body */
+  .topo-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 28px;
+    margin-bottom: 0;
+  }
+
+  /* Left: layer stack */
+  .layer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .layer-row {
+    display: grid;
+    align-items: stretch;
+    position: relative;
+  }
+
+  /* indented pyramid via margin-left */
+  .layer-row[data-l="0"] { margin-left: 0; }
+  .layer-row[data-l="1"] { margin-left: 24px; }
+  .layer-row[data-l="2"] { margin-left: 48px; }
+  .layer-row[data-l="3"] { margin-left: 72px; }
+  .layer-row[data-l="4"] { margin-left: 96px; }
+
+  .layer-card {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 20px 26px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: center;
+    border-left: 4px solid transparent;
+    box-shadow: 0 1px 3px rgba(30,40,50,0.06), 0 4px 12px -4px rgba(30,40,50,0.04);
+  }
+
+  .layer-card.l0 { border-left-color: var(--ink); }
+  .layer-card.l1 { border-left-color: var(--green); }
+  .layer-card.l2 { border-left-color: var(--green); opacity: 0.92; }
+  .layer-card.l3 { border-left-color: var(--pink); }
+  .layer-card.l4 {
+    border-left-color: var(--pink);
+    opacity: 0.8;
+    background: rgba(255,255,255,0.7);
+  }
+
+  .layer-num {
+    font: 700 36px/1 var(--mono);
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    min-width: 52px;
+  }
+
+  .layer-card.l0 .layer-num { color: var(--ink); font-size: 28px; }
+  .layer-card.l4 .layer-num { color: var(--ink-light); font-size: 28px; }
+
+  .layer-info {}
+
+  .layer-role {
+    font: 700 32px/1 var(--sans);
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 5px;
+  }
+
+  .layer-role .tag {
+    font: 500 17px/1 var(--mono);
+    color: var(--green);
+    margin-left: 10px;
+    vertical-align: middle;
+    letter-spacing: 0.03em;
+  }
+
+  .layer-role .tag-ceo {
+    color: var(--ink);
+    background: var(--ink);
+    color: var(--white);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 15px;
+  }
+
+  .layer-desc {
+    font: 400 22px/1.5 var(--sans);
+    color: var(--ink-light);
+  }
+
+  .layer-desc strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* connector tick */
+  .layer-row::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    width: 14px;
+    height: 1px;
+    background: rgba(30,40,50,0.18);
+  }
+
+  .layer-row[data-l="0"]::before { display: none; }
+
+  /* Right: iron rules panel */
+  .rules-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .rules-header {
+    font: 700 26px/1 var(--sans);
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .rules-header .rules-count {
+    font: 700 48px/1 var(--mono);
+    color: var(--green);
+    letter-spacing: -0.04em;
+  }
+
+  .rule-item {
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(30,40,50,0.08);
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .rule-item:last-child {
+    border-bottom: none;
+  }
+
+  .rule-n {
+    font: 600 19px/1.2 var(--mono);
+    color: var(--green);
+    letter-spacing: 0.01em;
+    padding-top: 2px;
+  }
+
+  .rule-text {
+    font: 400 20px/1.45 var(--sans);
+    color: var(--ink-light);
+  }
+
+  .rule-text strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Bottom band: benchmark proof */
+  .topo-proof-band {
+    margin-top: 28px;
+    background: rgba(122,157,184,0.1);
+    border: 1px solid rgba(122,157,184,0.22);
+    border-radius: 6px;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .proof-label {
+    font: 600 19px/1 var(--mono);
+    color: var(--green);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .proof-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(122,157,184,0.3);
+    flex-shrink: 0;
+  }
+
+  .proof-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .proof-val {
+    font: 700 38px/1 var(--mono);
+    color: var(--ink);
+    letter-spacing: -0.03em;
+  }
+
+  .proof-unit {
+    font: 400 20px/1 var(--sans);
+    color: var(--ink-light);
+  }
+
+  .proof-text {
+    font: 400 21px/1.5 var(--sans);
+    color: var(--ink-light);
+    flex: 1;
+  }
+
+  .proof-text strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <filter id="noise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+</svg>
+<div class="page">
+  <div class="grain"></div>
+
+  <div class="topo-wrap">
+
+    <!-- Header -->
+    <div class="topo-header">
+      <div class="topo-title">4-Layer <em>Nested</em><br>Parallel Topology</div>
+      <div class="topo-header-right">
+        <div class="topo-ref">REF—keel-harness / topology</div>
+        <div class="topo-subtitle">One sprint. True concurrency.<br>No sequential bottleneck.</div>
+      </div>
+    </div>
+
+    <!-- Metric band -->
+    <div class="topo-metric-band">
+      <div class="topo-metric-number">20</div>
+      <div class="topo-metric-divider"></div>
+      <div class="topo-metric-desc">
+        <strong>True nested agents</strong> — 1 P9 Tech Lead spawns 5 P8 workers,<br>each P8 spawns 4 P7 sub-agents in the same message
+      </div>
+      <div class="topo-metric-badge">v1.11.2 · verified</div>
+    </div>
+
+    <!-- Body: pyramid + rules -->
+    <div class="topo-body">
+
+      <!-- Left: layer stack -->
+      <div class="layer-stack">
+
+        <div class="layer-row" data-l="0">
+          <div class="layer-card l0">
+            <div class="layer-num">L0</div>
+            <div class="layer-info">
+              <div class="layer-role">CEO Maintainer <span class="tag tag-ceo">terminal authority</span></div>
+              <div class="layer-desc">Override P10 · Ratify sprints · <strong>Strategic veto</strong> · Define outcomes</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer-row" data-l="1">
+          <div class="layer-card l1">
+            <div class="layer-num">P10</div>
+            <div class="layer-info">
+              <div class="layer-role">CTO <span class="tag">strategy layer</span></div>
+              <div class="layer-desc">Define track · Build org · <strong>Decide</strong> · Never writes task prompts</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer-row" data-l="2">
+          <div class="layer-card l2">
+            <div class="layer-num">P9</div>
+            <div class="layer-info">
+              <div class="layer-role">Tech Lead <span class="tag">orchestration</span></div>
+              <div class="layer-desc"><strong>Writes Task Prompts</strong> · Manages P8 team · Never codes · Verifies with commands</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer-row" data-l="3">
+          <div class="layer-card l3">
+            <div class="layer-num">P8</div>
+            <div class="layer-info">
+              <div class="layer-role">Independent Executors <span class="tag">× 5 parallel</span></div>
+              <div class="layer-desc"><strong>Real parallel</strong> via same-message multi-Agent · File-domain isolated · Spawns P7 internally</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer-row" data-l="4">
+          <div class="layer-card l4">
+            <div class="layer-num">P7</div>
+            <div class="layer-info">
+              <div class="layer-role">Sub-agents <span class="tag">× 4 per P8</span></div>
+              <div class="layer-desc">Plan-driven sub-tasks · Spawned by P8 · <strong>P9 does not manage</strong></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: iron rules -->
+      <div class="rules-panel">
+        <div class="rules-header">
+          <span class="rules-count">08</span>
+          Iron Rules
+        </div>
+
+        <div class="rule-item">
+          <div class="rule-n">①</div>
+          <div class="rule-text"><strong>P9 spawns multiple P8</strong> in true parallel — same message, multiple Agent calls</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">②</div>
+          <div class="rule-text"><strong>P8 spawns P7</strong> internally — P9 never manages sub-topology</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">③</div>
+          <div class="rule-text">P10 does not write Task Prompts, does not manage P8</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">④</div>
+          <div class="rule-text"><strong>P9 never writes code</strong> — role misalignment = baseline violation</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">⑤</div>
+          <div class="rule-text">CEO overrides P10 at any time</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">⑥</div>
+          <div class="rule-text"><strong>File-domain isolation</strong> — grep verify before cross-agent writes</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">⑦</div>
+          <div class="rule-text">Same-message multi-Agent = <strong>true parallel</strong>, not sequential</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-n">⑧</div>
+          <div class="rule-text">P9 runs commands to <strong>verify</strong> — never claims done without evidence</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Proof band -->
+    <div class="topo-proof-band">
+      <div class="proof-label">Benchmark</div>
+      <div class="proof-divider"></div>
+      <div class="proof-stat">
+        <div class="proof-val">25</div>
+        <div class="proof-unit">min</div>
+      </div>
+      <div class="proof-text">
+        Nested parallel sprint completion vs. <strong>90 min sequential</strong> — 3.6× speedup.<br>
+        Verified in keel-harness v1.11.2 sprint · Wave-C · 5 P8 + 4 P7 per P8
+      </div>
+    </div>
+
+  </div>
+
+  <div class="colophon">
+    <div class="who">
+      <span>keel-harness · github.com/mr-shaper/keel-harness · Apache-2.0</span>
+    </div>
+    <span class="info-source"></span>
+  </div>
+</div>
+</body>
+</html>

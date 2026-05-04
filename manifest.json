@@ -37,7 +37,13 @@
     "plugins/compound-selfcheck-plugin/hooks/post-tool-compound-check.sh",
     "plugins/compound-selfcheck-plugin/README.md",
     "docs/sprint-kickoff-checklist.md",
-    "scripts/sync-self-check.sh"
+    "scripts/sync-self-check.sh",
+    "docs/visuals/topology-infograph.html",
+    "docs/visuals/topology-infograph.png",
+    "docs/visuals/pipeline-whiteboard.html",
+    "docs/visuals/pipeline-whiteboard.png",
+    "docs/visuals/gaps-sketchnote.html",
+    "docs/visuals/gaps-sketchnote.png"
   ],
   "manual_sync_files": [
     "templates/CLAUDE.md.global.template",

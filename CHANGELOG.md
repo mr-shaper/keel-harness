@@ -30,6 +30,21 @@ Four enhancements that strengthen the universal kernel without exposing private 
   pattern). Supports `--dry-run`, uses `$(hostname)` dynamic, `git rev-parse`
   fallback for `HARNESS_ROOT`.
 
+- **`docs/visuals/`** — Three rendered visual versions of harness core
+  concepts, each in a different ljg-card aesthetic mode (English-only, OSS
+  attribution footer):
+  - `topology-infograph.{html,png}` — 4-Layer Nested Parallel Topology in
+    infograph mode (data-density layout, hierarchical 5-layer authority chain
+    L0 CEO → P10 → P9 → P8 → P7 with 8 iron rules and benchmark metrics).
+  - `pipeline-whiteboard.{html,png}` — Phase 0-4 Pipeline + Wave Structure in
+    whiteboard mode (logic-chain style, sequential phase reasoning with red
+    dashed arrows and a wave sequence strip).
+  - `gaps-sketchnote.{html,png}` — 4 Gaps It Fills + Solutions in sketchnote
+    mode (Mike Rohde concept-map style, hand-drawn feel with circled problem
+    words, dashed connectors, micro-rotations).
+  Three versions exist so a maintainer can pick the aesthetic that best fits
+  README hero placement; embedding decision is deferred to a follow-up commit.
+
 ### Changed
 
 - **`hooks/pre-tool-handoff-read-gate.sh`** — `resolve_harness_root()` three-path
