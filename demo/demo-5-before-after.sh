@@ -61,7 +61,7 @@ echo "  abc123def..."
 echo "  feat(auth): add bearer token middleware"
 echo ""
 red '  --- src/auth.ts:5 ---'
-red '  + const API_KEY = "sk-prod-7f9a2b1c..."   # hardcoded'
+red '  + const API_KEY = "sk-fake-DEMO-not-a-real-key-abc123"   # hardcoded'
 sleep 1.6
 
 echo ""
