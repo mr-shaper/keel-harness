@@ -26,6 +26,9 @@ SKIP_PATHS=(
   "SECURITY.md"             # security policy: legitimate use of project noreply contact email
   "CODE_OF_CONDUCT.md"      # Contributor Covenant: legitimate use of project noreply contact email
   "CONTRIBUTING.md"         # contributor guide: legitimate references to project author handle
+  "ROADMAP.md"              # forward-looking plan: legitimate references to project namespace
+  "docs/quickstart-prompts.md"   # user-facing prompt templates: reference project paths
+  "docs/upgrade-from-github.md"  # upgrade SOP: documents project namespace and SSH URLs
   "HARNESS_BIBLE.md"        # project bible: documents brand name + maintainer references by design
   "tests/test-pre-commit.sh" # mock PII test data (by design)
   "tests/test-sync.sh"      # mock PII test data (by design)
@@ -44,6 +47,7 @@ SKIP_PATHS=(
 CONTEXT_FILTER_PATTERNS=(
   'github\.com/[a-zA-Z0-9_-]+/'
   'raw\.githubusercontent\.com/[a-zA-Z0-9_-]+/'
+  'git@github\.com:[a-zA-Z0-9_-]+/'
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

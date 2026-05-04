@@ -146,6 +146,54 @@ After install, start your first harnessed session:
 3. Work — Stop hook writes the next handoff automatically
 ```
 
+### Standard Plan-Authoring Prompt (copy-paste this for any non-trivial task)
+
+When you give the agent a task that has 3+ steps, multi-file changes, or
+crosses module boundaries, paste this prompt verbatim. It binds the agent
+to the harness execution contract and prevents the most common failure
+mode (skipping workflow reads, which causes the UserPromptSubmit hook to
+emit warnings mid-conversation).
+
+```text
+For this task, design and execute the plan under the four-layer nested
+parallel topology of harness:
+
+  Harness  ⊃  OODC  ⊃  PUA P10-9-8-7  ⊃  Superpower Pipeline
+
+The plan itself must read as a guide that future executing agents follow
+under the same topology — annotate each Wave / Phase with which layer
+drives it (which OODC step, which role tier, which Pipeline phase).
+
+Before drafting the plan, READ these five workflow MDs (skipping them
+triggers a UserPromptSubmit warning that interrupts the conversation):
+
+  1. workflows/pua-topology.md
+  2. workflows/oodc-superpower-harness-orchestration.md
+  3. workflows/superpower-pipeline.md
+  4. workflows/skill-loading-sop.md
+  5. workflows/kb-ingestion-sop.md
+
+Then verify any Skill you intend to invoke is REALLY loaded
+(skill-loading-sop §5 — five dimensions: tool-call, references body Read,
+protocol applied, sub-agent injection, evidence-aligned self-eval).
+A Skill listed in inventory is not the same as a Skill actually loaded.
+
+Wave / Phase tracking is mandatory: every Wave and every Phase in the
+plan MUST have a TaskCreate entry. The TaskCreate list IS the Superpower
+Pipeline stage tracker — update statuses as you progress
+(pending → in_progress → completed). No Wave without a task entry.
+
+Once the plan is drafted with topology annotations, ratification gates,
+and TaskCreate entries, present it for approval before execution.
+```
+
+The full version of this contract — failure modes, role definitions,
+skill verification protocol — lives in
+[`docs/agent-execution-standard.md`](docs/agent-execution-standard.md).
+
+For more user-facing prompts (project bootstrap, sprint kickoff, sprint
+close, etc.), see [`docs/quickstart-prompts.md`](docs/quickstart-prompts.md).
+
 ---
 
 ## What's Inside (Kernel Scope)
