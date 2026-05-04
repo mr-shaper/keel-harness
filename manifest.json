@@ -54,7 +54,8 @@
     "CODE_OF_CONDUCT.md",
     ".github/ISSUE_TEMPLATE/bug_report.md",
     ".github/ISSUE_TEMPLATE/feature_request.md",
-    ".github/pull_request_template.md"
+    ".github/pull_request_template.md",
+    "docs/launch-announcements.md"
   ],
   "manual_sync_files": [
     "templates/CLAUDE.md.global.template",
