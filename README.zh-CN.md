@@ -146,8 +146,11 @@ Harness (项目级，跨 8 周多 session)
              │   Phase 3 开发
              │   Phase 4 收尾
              │
-             └─ PUA P10 / P9 / P8 / P7
-                  P10 = CEO override — 钦定战略，不写代码
+     CEO（人类用户）—— 终极 authority，在所有 AI 角色之上
+       │  钦定 / 越过 P10；每个战略决策的 final trump card
+       ↓
+             └─ PUA P10 / P9 / P8 / P7  （全是 AI 角色）
+                  P10 = CTO（AI 战略层）—— 在 CEO 之下钦定，派 P9，不写代码
                   P9   = Tech Lead —— 写 Task Prompt，不写代码
                   P8   = Senior Eng —— 同 message 真并行，独占文件域
                   P7   = P8 派的 sub-agent —— 颗粒度细的 sub task
@@ -160,7 +163,7 @@ Harness (项目级，跨 8 周多 session)
 2. P8 内部 spawn P7，P9 不操心 sub-topology
 3. P10 不写 Task Prompt，不管 P8（只跟 P9 对话）
 4. **P9 绝不下场写代码** —— 写代码 = 角色错位 = 自动 PUA 3.5 跌破
-5. CEO（P10）永远 override P9
+5. **CEO（人类用户）永远 override P10** —— CEO 是人，P10 是 AI CTO；CEO 是整个 AI 层级之上的终极 authority
 6. 文件域隔离 —— 派多 P8 前 grep verify 文件域不重叠
 7. 同 message 多 Agent = 真并行（不是 loop sequential）
 8. P9 跑 verify 命令 + paste 输出 —— 不空口

@@ -55,7 +55,7 @@ Each layer has a distinct, non-overlapping responsibility:
 
 ### D — Decide (Strategy)
 - Spawn P10 to define the 6-element strategic input.
-- CEO override always trumps P10.
+- CEO (the human user) override always trumps P10. CEO sits above all AI roles.
 - List paths A/B/C/D as equals with quantified Pros/Cons.
 - Define scope boundary explicitly: what is in scope / out of scope.
 
@@ -68,7 +68,7 @@ Each layer has a distinct, non-overlapping responsibility:
 |-------|------------|-----------------|
 | **Phase 0 Kickoff** | Load SKILLS for real + TaskCreate board + read 5 required docs + answer 5 self-checks | Phase 0.1 (skill body Read) + 0.2 (12 tasks created) |
 | **Phase 1 Explore** | P9 dispatches multiple P8 agents in true parallel to research + verify hypotheses | Phase 6.3 (P8 verify 6 plugin hook fire statuses) |
-| **Phase 2 Decide** | P9 reports up; P10 ratifies; CEO override path | Phase 6.1+6.2 (P10 round 2+3 ratify S3 hybrid) |
+| **Phase 2 Decide** | P9 reports up; P10 (AI CTO) ratifies; CEO (human) override path always available | Phase 6.1+6.2 (P10 round 2+3 ratify S3 hybrid) |
 | **Phase 3 Build** | P9 dispatches multiple P8 agents in true parallel to ship deliverables | Phase 6.4 (P8 round 6 S3 migrate script + apply) |
 | **Phase 4 Wrap-up** | NEW handoff + SELFCHANGELOG + state + lessons + KB ingest via doc-sync skill | Phase 5.6 + 6.6 (5 P8 true-parallel ship 6 deliverables) |
 
@@ -84,13 +84,13 @@ Each layer has a distinct, non-overlapping responsibility:
 
 See `$CLAUDE_HOME/workflows/pua-topology.md` for the full decision tree and nested parallel graph. Core:
 
-- **CEO** (ultimate authority) — ratifies / overrides P10.
-- **P10** (strategy layer) — spawns `pua:cto-p10`, writes 6-element strategic input, does NOT write Task Prompts.
+- **CEO** (the human user, ultimate authority above all AI roles) — ratifies / overrides P10.
+- **P10** (AI CTO / strategy layer) — spawns `pua:cto-p10`, writes 6-element strategic input under CEO authority, does NOT write Task Prompts.
 - **P9** (Tech Lead) — runs inline this session, writes Task Prompts, dispatches multiple P8 agents in true parallel.
 - **P8** (independent contributor) — spawned as Agent, file domain must not overlap, resolves P7 internally.
 - **P7** (sub-task) — spawned internally by P8, applies three-question self-review.
 
-**8 Iron Rules**: P9 dispatches multiple P8 in true parallel / P8 spawns P7 internally / P10 does not manage P8 directly / P9 never writes code (role violation) / CEO always overrides / file domain isolation / same-message multi-Agent = true parallel / verification-before-completion closes the loop.
+**8 Iron Rules**: P9 dispatches multiple P8 in true parallel / P8 spawns P7 internally / P10 does not manage P8 directly / P9 never writes code (role violation) / CEO (the human user) always overrides P10 (CEO is human, P10 is AI CTO) / file domain isolation / same-message multi-Agent = true parallel / verification-before-completion closes the loop.
 
 ## §7 v1.11.2 Production Example (Live Case)
 
@@ -106,8 +106,8 @@ See `$CLAUDE_HOME/workflows/pua-topology.md` for the full decision tree and nest
 - N+3: handoff-read-gate jq parse on 23KB byte-slice (L36 emergent).
 
 ### D — Decide (CEO Override)
-- P10 round 1 ratified Path B (push v1.12) → CEO overrode to Path D (symlink unify).
-- P10 round 2 ratified S1 Path A workaround → CEO upgraded to S3 hybrid.
+- P10 round 1 ratified Path B (push v1.12) → CEO (the human user) overrode to Path D (symlink unify).
+- P10 round 2 ratified S1 Path A workaround → CEO (the human user) upgraded to S3 hybrid.
 - P10 round 3 ratified S3 hybrid 1.C / 2.A / 3.B / 4 (Wave 1 enforce core / hooks={} skeleton / drift detection / 6-dim verify).
 
 ### C — Create (Phase 0-4 in Production)
@@ -126,7 +126,7 @@ See `$CLAUDE_HOME/workflows/pua-topology.md` for the full decision tree and nest
 
 1. **Enter harness mode** (cwd contains `.harness/state` → automatic) — SessionStart auto-injects.
 2. **OODC O phase** — argus genuine research + 5 required reads + evidence-paste true-cause reveal.
-3. **OODC D phase** — spawn P10 to define 6-element strategic input (CEO override is always the trump card).
+3. **OODC D phase** — spawn P10 to define 6-element strategic input (CEO — the human user — override is always the trump card; CEO sits above the AI P10 layer).
 4. **Superpower Phase 0 Kickoff** — load Skills for real + TaskCreate board + answer 5 self-checks.
 5. **Superpower Phase 1-3** — P9 dispatches multiple P8 agents in true parallel (same-message multi-Agent calls).
 6. **Superpower Phase 4 Wrap-up** — NEW handoff + SELFCHANGELOG + state + lessons + KB ingest via doc-sync skill.

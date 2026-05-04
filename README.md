@@ -220,8 +220,11 @@ Harness (cross-session, weeks to months)
              │   Phase 3  development  (N waves of true parallel P8 agents)
              │   Phase 4  close (launch / retrospective / handoff)
              │
-             └─ PUA P10 / P9 / P8 / P7
-                  P10  = CEO override — ratifies strategy, never writes code
+     CEO (the human user) — ultimate authority, sits above all AI roles
+       │  ratifies / overrides P10 ; final trump card on every strategic decision
+       ↓
+             └─ PUA P10 / P9 / P8 / P7  (all AI roles)
+                  P10  = CTO (AI strategy layer) — ratifies under CEO, dispatches to P9, never writes code
                   P9   = Tech Lead — writes Task Prompts, never writes code
                   P8   = Senior Eng — same-message true parallel, owns a file domain
                   P7   = P8-spawned sub-agent — granular sub-tasks
@@ -234,7 +237,7 @@ Harness (cross-session, weeks to months)
 2. P8 spawns P7 internally — P9 never manages P7 directly
 3. P10 never writes Task Prompts, never manages P8
 4. **P9 never writes code** — writing code = role drift = automatic PUA 3.5 penalty
-5. CEO (P10) always overrides P9
+5. **CEO (the human user) always overrides P10** — CEO is human, P10 is the AI CTO; CEO is the ultimate authority above the entire AI hierarchy
 6. File domain isolation — grep-verify no overlap before dispatch
 7. Same-message multi-Agent = true parallel (not loop-sequential)
 8. P9 runs verification commands and pastes output — no empty claims

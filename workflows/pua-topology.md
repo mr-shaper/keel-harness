@@ -70,7 +70,7 @@ stale: false
 | 2 | **P8 spawns P7 internally** — P9 does not micromanage P8's sub-topology | P9 overstepping into P8 internals (role confusion) |
 | 3 | **P10 does NOT write Task Prompts, does NOT manage P8** (talks only to P9) | P10 operating below its level |
 | 4 | **P9 NEVER writes code** (writing code = role misalignment failure mode) | Falls below 3.5 baseline |
-| 5 | **CEO overrides P10** with final ratification (D-path examples) | — (CEO is always trump card) |
+| 5 | **CEO (the human user) overrides P10** with final ratification (D-path examples). CEO is human, P10 is the AI CTO; CEO is the ultimate authority above the entire AI hierarchy | — (CEO is always trump card) |
 | 6 | **Non-overlapping file domains**: parallel P8s must not touch the same files; P9 grep-verifies | Race conditions + data corruption |
 | 7 | **Same-message** multi-Agent calls = true parallel (NOT sequential) | Pseudo-parallel — performance loss |
 | 8 | **Verification loop closed**: P9 runs commands to verify P8 actually shipped, no verbal claims | Breaks red-line #1 (closed loop) |
