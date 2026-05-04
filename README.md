@@ -3,8 +3,8 @@
 > Harness for Claude Code: 24h cross-session continuity + canonical honesty enforcement + P10-9-8-7 nested parallel agent topology — Karpathy's agentic engineering, made enforceable.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/mrshaper/harness-engineering/actions)
-[![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](https://github.com/mrshaper/harness-engineering/releases)
+[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/mr-shaper/keel-harness/actions)
+[![Version](https://img.shields.io/badge/version-v0.1.0--alpha-orange)](https://github.com/mr-shaper/keel-harness/releases)
 
 ![5 vocab + 4 gaps demo](demo/demo-4.gif)
 
@@ -51,23 +51,23 @@ Most teams hit these walls within weeks of using Claude Code for serious enginee
 > **Note**: `install.sh` ships in W3 (see roadmap). The one-liner below will work when W3 lands.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mrshaper/harness-engineering/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mr-shaper/keel-harness/main/install.sh | bash
 ```
 
 Until then, manual bootstrap:
 
 ```bash
 # Step 1: Clone the kernel
-git clone https://github.com/mrshaper/harness-engineering.git ~/.claude/plugins/harness-engineering-mp
+git clone https://github.com/mr-shaper/keel-harness.git ~/.claude/plugins/keel-harness-mp
 
 # Step 2: Apply Layer 0 contract templates
-cp ~/.claude/plugins/harness-engineering-mp/templates/CLAUDE.md.global.template ~/.claude/CLAUDE.md
+cp ~/.claude/plugins/keel-harness-mp/templates/CLAUDE.md.global.template ~/.claude/CLAUDE.md
 # Edit ~/.claude/CLAUDE.md — fill in the <PLACEHOLDER> fields for your context
 
 # Step 3: Merge hooks into settings.json (requires jq)
 jq -s '.[0] * .[1]' \
   ~/.claude/settings.json \
-  ~/.claude/plugins/harness-engineering-mp/templates/settings.json.template \
+  ~/.claude/plugins/keel-harness-mp/templates/settings.json.template \
   > /tmp/settings-merged.json && mv /tmp/settings-merged.json ~/.claude/settings.json
 # Restart Claude Code — harness hooks are now active
 ```
@@ -292,9 +292,9 @@ includes a patent grant — appropriate for infrastructure frameworks. See LICEN
 The following badges will be populated when GitHub Actions CI ships in W5:
 
 ```
-[![CI](https://github.com/mrshaper/harness-engineering/actions/workflows/ci.yml/badge.svg)]
+[![CI](https://github.com/mr-shaper/keel-harness/actions/workflows/tests.yml/badge.svg)]
 [![Coverage](https://img.shields.io/badge/coverage-TBD-lightgrey)]
-[![Version](https://img.shields.io/github/v/tag/mrshaper/harness-engineering)]
+[![Version](https://img.shields.io/github/v/tag/mr-shaper/keel-harness)]
 ```
 
 ---

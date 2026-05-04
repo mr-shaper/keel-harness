@@ -80,6 +80,6 @@ sleep 1.5
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo "  See README.md for install + ARCHITECTURE.md for full topology"
-echo "  github.com/mrshaper/harness-engineering — Apache-2.0"
+echo "  github.com/mr-shaper/keel-harness — Apache-2.0"
 echo "═══════════════════════════════════════════════════════════════"
 sleep 2

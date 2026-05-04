@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # install.sh — harness-engineering OSS Release v0.1.0
-# One-line install: bash <(curl -fsSL https://raw.githubusercontent.com/harness-engineering/harness-engineering/main/install.sh)
+# One-line install: bash <(curl -fsSL https://raw.githubusercontent.com/mr-shaper/keel-harness/main/install.sh)
 # Local install: bash install.sh [--dry-run] [--with-pua] [--with-claude-mem] [--with-superpowers] [--with-tacit-kb] [--with-docsync] [--help]
 #
 # Phases:
@@ -17,7 +17,7 @@ set -euo pipefail
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 HARNESS_VERSION="0.1.0"
-HARNESS_HOME="${HARNESS_HOME:-${HOME}/.claude/plugins/harness-engineering-mp}"
+HARNESS_HOME="${HARNESS_HOME:-${HOME}/.claude/plugins/keel-harness-mp}"
 CLAUDE_HOME="${CLAUDE_HOME:-${HOME}/.claude}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DRY_RUN="${INSTALL_DRY_RUN:-0}"
@@ -56,7 +56,7 @@ OPTIONS:
 
 ENVIRONMENT:
   INSTALL_DRY_RUN=1   Same as --dry-run
-  HARNESS_HOME        Installation target (default: ~/.claude/plugins/harness-engineering-mp)
+  HARNESS_HOME        Installation target (default: ~/.claude/plugins/keel-harness-mp)
   CLAUDE_HOME         Claude config dir (default: ~/.claude)
 
 PHASES:
@@ -379,7 +379,7 @@ phase4_optional_plugins() {
     any=1
     info "Phase 4: --with-pua"
     echo "  PUA is a private plugin (the maintainer's personal system)."
-    echo "  Visit: https://github.com/harness-engineering/pua-plugin (if public)"
+    echo "  Visit: https://github.com/mr-shaper/pua-plugin (if public)"
     echo "  Install manually per its README. We do NOT install it for you."
     echo ""
   fi
@@ -396,7 +396,7 @@ phase4_optional_plugins() {
     echo "  uses or distributes code under AGPL-3.0 must also be released"
     echo "  under AGPL-3.0 (including network-use SaaS)."
     echo ""
-    echo "  Visit for manual install: https://github.com/harness-engineering/claude-mem"
+    echo "  Visit for manual install: https://github.com/mr-shaper/claude-mem"
     echo "  YOUR RESPONSIBILITY TO COMPLY with AGPL-3.0 terms."
     echo "  ─────────────────────────────────────────────────────────────────"
     echo ""
@@ -406,7 +406,7 @@ phase4_optional_plugins() {
     any=1
     info "Phase 4: --with-tacit-kb"
     echo "  tacit-kb is an internal plugin (license unclear)."
-    echo "  Visit: https://github.com/harness-engineering/tacit-kb (if public)"
+    echo "  Visit: https://github.com/mr-shaper/tacit-kb (if public)"
     echo "  Install manually per its README. We do NOT install it for you."
     echo ""
   fi
@@ -415,7 +415,7 @@ phase4_optional_plugins() {
     any=1
     info "Phase 4: --with-docsync"
     echo "  doc-sync is an internal plugin (license unclear)."
-    echo "  Visit: https://github.com/harness-engineering/doc-sync (if public)"
+    echo "  Visit: https://github.com/mr-shaper/doc-sync (if public)"
     echo "  Install manually per its README. We do NOT install it for you."
     echo ""
   fi

@@ -126,8 +126,8 @@ REPO6="$(make_repo 6)"
 cat > "${REPO6}/README.md" <<'READMEEOF'
 # harness-engineering
 
-See the repo at https://github.com/mrshaper/harness-engineering for details.
-Install: git clone https://github.com/mrshaper/harness-engineering.git
+See the repo at https://github.com/mr-shaper/keel-harness for details.
+Install: git clone https://github.com/mr-shaper/keel-harness.git
 
 ## Overview
 
