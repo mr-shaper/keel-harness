@@ -84,6 +84,10 @@ jobs:
           fi
         shell: bash
 
+      - name: Run test-manifest-completeness.sh
+        run: bash tests/test-manifest-completeness.sh
+        shell: bash
+
       - name: Test summary
         if: success()
         run: |
@@ -91,4 +95,5 @@ jobs:
           echo "  All tests PASSED on ${{ matrix.os }}"
           echo "  ShellCheck + test-sync + test-pre-commit"
           echo "  + test-install + test-red-team (if present)"
+          echo "  + test-manifest-completeness"
           echo "============================================"

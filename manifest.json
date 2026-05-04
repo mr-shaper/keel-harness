@@ -15,7 +15,7 @@
     "hooks/session-start-layer0-health.sh",
     "hooks/pre-tool-plan-quality-gate.sh",
     "templates/handoff-template.md",
-    "templates/cat-h-律-template.md",
+    "templates/cat-h-rule-template.md",
     "audit/romeo-6-dim-framework.md",
     "install.sh",
     "sync.sh",

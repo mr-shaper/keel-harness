@@ -29,7 +29,7 @@ messaging: dingtalk
 
 ## Simulated Identity Mapping
 
-real_name: Maintainer Zhu
+real_name: Mr Shaper Zhu
 internal_alias: mrshaper
 team: example-employer-US-KA
 project: example-employer Last-Mile Solutions

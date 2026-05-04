@@ -85,11 +85,12 @@ test_phase1_cp() {
     fail "test_phase1_cp (sync.sh)" "Expected ${harness_home}/sync.sh — manifest.kernel_files must include sync.sh"
   fi
 
-  # Verify WARN emitted for missing hooks (not yet created, future waves)
+  # W6.5 update: manifest now 100% complete (29/29 kernel files real).
+  # Invert the old vaporware-era assertion — no source files should be missing.
   if echo "$output" | grep -q "Source file not found\|skipping"; then
-    pass "test_phase1_cp (WARN for missing source files emitted)"
+    fail "test_phase1_cp (no-missing)" "Unexpected WARN about missing source files — manifest must be 100% complete"
   else
-    fail "test_phase1_cp (warn)" "Expected WARN for missing source files in output"
+    pass "test_phase1_cp (manifest 29/29 complete, 0 WARN)"
   fi
 
   cleanup "$ws"

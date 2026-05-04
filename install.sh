@@ -384,8 +384,13 @@ phase3_settings_json() {
 
   local settings_template="${REPO_ROOT}/templates/settings.json.template"
   local settings_dest="${CLAUDE_HOME}/settings.json"
-  local tmp_merged
-  tmp_merged="$(mktemp /tmp/harness-settings-merged-XXXXXX.json)"
+  local tmp_merged tmp_merged_base
+  # Cross-platform mktemp: macOS BSD mktemp does NOT substitute X's followed by
+  # a suffix like .json (would create literal "XXXXXX.json"). Use suffix-free
+  # template + post-rename, which works on both macOS and Linux.
+  tmp_merged_base="$(mktemp /tmp/harness-settings-merged-XXXXXX)"
+  tmp_merged="${tmp_merged_base}.json"
+  mv "$tmp_merged_base" "$tmp_merged"
 
   if [[ ! -f "$settings_template" ]]; then
     warn "Phase 3: settings.json.template not found — skipping"
