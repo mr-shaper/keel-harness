@@ -7,6 +7,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.4] — 2026-05-05 — Context-aware handoff (PCT gate + model-aware WINDOW)
+
+### Added
+
+- ✨ **`hooks/post-tool-context-monitor.sh`**: New PostToolUse hook that computes
+  `context%` from the transcript's last assistant message usage on every tool call,
+  persists `total/window/pct` to `.harness/hook-trace.log`, and emits stderr alerts
+  at the 60% / 70% thresholds. The 70% line is a HARD STOP nudge to start a fresh
+  session; the 60% line writes a `handoff-required.flag` and emits a soft warning.
+  The total-token formula matches the upstream claude-hud `getTotalTokens`
+  (`src/stdin.ts:134-141`): `cache_read + cache_creation + input` —
+  `output_tokens` is intentionally excluded since it does not contribute to the
+  current context occupancy seen by the model on the next turn.
+
+- ✨ **Model-aware context window** in the new hook. The window auto-detects from
+  the transcript's last assistant `message.model` field: any model id matching
+  `*haiku*` resolves to `WINDOW=200000` (Haiku 4.5 ships with a 200k window);
+  Opus / Sonnet (and unknown / unmatched ids) default to `WINDOW=1000000` with
+  the existing `HARNESS_CTX_WINDOW` env override available. Without this fix,
+  sessions on Haiku reported PCT 5× lower than reality and the 70% gate never
+  fired, masking real context pressure until the session crashed.
+
+- ✨ **`tests/test-context-aware-handoff.sh`**: e2e test suite (7 cases) covering
+  the gate's skip / above-gate / cold-start fallback / force-flag / env-override
+  paths plus Haiku-vs-Opus window detection. Default mode runs all 7; the
+  `--post-tool-only` flag restricts to Test 6+7 (no stop-handoff dependency).
+
+### Changed
+
+- 🔧 **`hooks/stop-handoff-writer.sh`**: Added a context-aware gate near the top
+  of the script (after the harness-project check, before field collection). The
+  gate reads the latest `pct` value from `.harness/hook-trace.log`. If the value
+  is numeric and below `HARNESS_HANDOFF_PCT_THRESHOLD` (default 70), the hook
+  writes a `SKIP ctx=N% < threshold=70%` trace line and exits 0 without writing
+  the handoff file. A `.harness/handoff-force.flag` file overrides the gate for
+  one Stop event (the flag is auto-cleared on success). Long sessions no longer
+  accumulate handoff churn on every Stop — only when context pressure crosses
+  the gate. If the trace log is missing or unparseable (cold start, race), the
+  gate falls through to the original write path (safe side, never lose a handoff).
+
+- 🔧 **`templates/settings.json.template`**: Registered the new
+  `post-tool-context-monitor.sh` hook as a `PostToolUse` entry with `matcher: "*"`
+  so it fires on every tool call (5-second timeout). Bumped
+  `_harness_hooks_count` 9 → 10.
+
+- 🔧 **`manifest.json`**: Added `hooks/post-tool-context-monitor.sh` to
+  `kernel_files[]` so `install.sh` Phase 1 copies the hook into `HARNESS_HOME`
+  alongside the other kernel hooks.
+
+### Why this matters
+
+- 🟡 **Long-session handoff churn** (alpha.3 and earlier): every Stop event wrote
+  a fresh `.harness/handoff.md`, regardless of whether the session had actually
+  accumulated context warranting a handoff. Long dev sessions racked up dozens
+  of near-identical handoffs on every interactive pause.
+- 🔴 **Haiku PCT under-report (5×)** (alpha.3 and earlier): the original PCT
+  formula was hardcoded to a 1M context window. Sessions running Claude Haiku 4.5
+  (200k window) reported PCT at 1/5 of the real value, so the 70% nudge never
+  fired and users hit the actual context limit without warning.
+- 🔵 **`output_tokens` over-counting** (alpha.3 and earlier): including
+  `output_tokens` in the total inflates PCT by up to ~6% in edge cases and breaks
+  alignment with upstream tooling that consumes the same usage object.
+
+### Verification
+
+- All existing 6 test suites continue to PASS, plus the new
+  `test-context-aware-handoff.sh` adds 7 cases (5 stop-handoff PCT-gate paths +
+  2 post-tool model-aware paths).
+- New hook tested via dummy `.harness/` fixtures with both Opus and Haiku
+  transcripts; trace shows `window=200000` for Haiku and `window=1000000` for
+  Opus.
+- Existing Stop hook behavior is unchanged when `hook-trace.log` is absent (cold
+  start) or contains no parsable `ctx-monitor` line — the gate falls through to
+  the original write path (safe side).
+
+---
+
 ## [0.1.0-alpha.3] — 2026-05-04 — Romeo R2 audit fix (6 findings, 0 P0/P1)
 
 ### Fixed

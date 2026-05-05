@@ -5,7 +5,13 @@
 # Exit: always 0 (best-effort, never block session end)
 
 set -uo pipefail
-trap 'exit 0' ERR
+# Note: removed `trap 'exit 0' ERR` (alpha.3) — on macOS bash 3.2, ERR trap fires
+# under pipefail even without `set -e`, which prematurely exited the script when
+# benign no-match globs (e.g. `ls handoff-S*-to-S*.md` in a fresh project)
+# returned non-zero. We now guard the specific risky commands with `|| true` /
+# `2>/dev/null` rather than blanket-suppressing every error. Best-effort intent
+# preserved: every individual write is best-effort and the final `exit 0`
+# guarantees the hook never blocks session end.
 
 # ── Graceful JSON parse with jq or python3 fallback ──────────────────────────
 parse_session_id() {
@@ -33,11 +39,57 @@ else
 fi
 [[ -z "${PAYLOAD}" ]] && PAYLOAD="{}"
 
-# ── Skip if not a harness project ────────────────────────────────────────────
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-HARNESS_DIR="${REPO_ROOT}/.harness"
+# ── Resolve project dir (JSON cwd > git toplevel > pwd) ──────────────────────
+# Claude Code's hook contract provides cwd in the stdin payload; honor it first
+# so test fixtures and IDE-launched sessions land on the right .harness/ dir.
+# Fall back to git toplevel (covers OSS users who bash-launch outside Claude
+# Code), then pwd as a last resort.
+PROJECT_DIR=""
+if command -v jq >/dev/null 2>&1; then
+  PROJECT_DIR="$(jq -r '.cwd // empty' <<<"${PAYLOAD}" 2>/dev/null || true)"
+fi
+if [[ -z "${PROJECT_DIR}" || ! -d "${PROJECT_DIR}" ]]; then
+  PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+fi
+REPO_ROOT="${PROJECT_DIR}"
+HARNESS_DIR="${PROJECT_DIR}/.harness"
 if [[ ! -d "${HARNESS_DIR}" ]]; then
   exit 0
+fi
+
+# ── Context-aware gate (alpha.4) ─────────────────────────────────────────────
+# Skip handoff when context% < threshold (default 70). Reads latest pct from
+# .harness/hook-trace.log (post-tool-context-monitor writes it). Empty / missing
+# trace → fallback to original write path (safe side, never lose a handoff).
+HARNESS_HANDOFF_PCT_THRESHOLD="${HARNESS_HANDOFF_PCT_THRESHOLD:-70}"
+HARNESS_FORCE_FLAG="${HARNESS_DIR}/handoff-force.flag"
+HOOK_TRACE="${HARNESS_DIR}/hook-trace.log"
+NOW_TS="$(date '+%Y-%m-%dT%H:%M:%S%z')"
+
+if [[ -f "${HARNESS_FORCE_FLAG}" ]]; then
+  # Force-flag escape: write handoff once, clear flag.
+  if ! rm -f "${HARNESS_FORCE_FLAG}" 2>/dev/null; then
+    printf '[%s] stop-handoff: FORCE_FLAG_RM_FAILED path=%s manual-clean-required\n' \
+      "${NOW_TS}" "${HARNESS_FORCE_FLAG}" >> "${HOOK_TRACE}" 2>/dev/null || true
+  fi
+  # (continue to write — force mode bypasses gate)
+else
+  CTX_PCT_RAW="$( { tail -100 "${HOOK_TRACE}" 2>/dev/null \
+    | grep -E 'ctx-monitor:.*pct=[0-9]+%' \
+    | tail -1 \
+    | sed -E 's|.*pct=([0-9]+)%.*|\1|' \
+    | tr -d '[:space:]'; } || true )"
+  CTX_PCT=""
+  if [[ -n "${CTX_PCT_RAW}" ]] && printf '%s' "${CTX_PCT_RAW}" | grep -qE '^[0-9]+$'; then
+    CTX_PCT="${CTX_PCT_RAW}"
+  fi
+  if [[ -n "${CTX_PCT}" ]] && [[ "${CTX_PCT}" -lt "${HARNESS_HANDOFF_PCT_THRESHOLD}" ]]; then
+    printf '[%s] stop-handoff: SKIP ctx=%s%% < threshold=%s%%\n' \
+      "${NOW_TS}" "${CTX_PCT}" "${HARNESS_HANDOFF_PCT_THRESHOLD}" \
+      >> "${HOOK_TRACE}" 2>/dev/null || true
+    exit 0
+  fi
+  # CTX_PCT empty (cold start / race / non-numeric) → fallback to original write path
 fi
 
 # ── Collect fields ────────────────────────────────────────────────────────────
@@ -76,7 +128,12 @@ fi
 # Iron rule: Stop hook does ZERO AI summary. But if P9/CEO inline-wrote a handoff
 # with a real next_action, defer to that authoritative source instead of TBD placeholder.
 NEXT_ACTION="TBD-next-action-absent"
-LATEST_AUTHORITATIVE="$(ls -1t "${HARNESS_DIR}"/handoff-S*-to-S*.md 2>/dev/null | head -1)"
+NEXT_ACTION_SOURCE=""
+# `find` succeeds with empty output on no-match (unlike `ls` which exits 1 and
+# trips pipefail). Sort by mtime descending to mimic `ls -1t`.
+LATEST_AUTHORITATIVE="$(find "${HARNESS_DIR}" -maxdepth 1 -name 'handoff-S*-to-S*.md' -type f -print0 2>/dev/null \
+  | xargs -0 ls -1t 2>/dev/null \
+  | head -1 || true)"
 if [[ -n "${LATEST_AUTHORITATIVE}" ]] && [[ -f "${LATEST_AUTHORITATIVE}" ]]; then
   EXTRACTED="$(awk '/^next_action:/{flag=1} flag{print; if(/"$/) exit}' "${LATEST_AUTHORITATIVE}" 2>/dev/null \
     | sed 's/^next_action: *//;s/^"//;s/"$//' | head -c 2000)"

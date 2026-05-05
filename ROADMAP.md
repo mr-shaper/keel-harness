@@ -104,6 +104,17 @@ land here.
   `curl -fsSL .../releases/download/v0.1.0-alpha/install.sh | bash` as the
   stable install path alongside the rolling `main` URL.
 
+- **[B-path] Marketplace-ize dev repo** (deferred from a 2026-05-04 dogfood
+  decision). Today `install.sh` deploys via `cp -R` into a fresh marketplace
+  package directory. A maintainer who has been running an earlier-iteration
+  package locally for some time may end up with a divergent fork — same
+  filenames in two places, content drift over time, no shared upstream. The
+  long-term remedy is to add `.claude-plugin/marketplace.json` to this repo
+  and route install through `claude plugin install harness@<dev-repo>`, so a
+  single source of truth covers both maintainer dogfood and OSS users.
+  Estimated effort: half-day sprint. Blocked on choosing a plugin name and
+  migration path that coexist with any pre-existing local package.
+
 ---
 
 ## v0.2 — Compound Engineering deeper (1-3 months)
