@@ -281,8 +281,12 @@ phase1_5_install_bundled_plugins() {
   fi
 
   if [[ -d "$oodc_dst" ]] && [[ -f "$oodc_dst/plugin.json" ]]; then
-    warn "  ~/.claude/plugins/oodc/ already exists — backing up to oodc.bak.$(date +%s)"
-    mv "$oodc_dst" "${oodc_dst}.bak.$(date +%s)"
+    # Capture timestamp ONCE; reusing $(date +%s) twice (warn message vs mv path)
+    # creates a TOCTOU window where a second boundary mid-call leaves the warn
+    # message pointing at a path that doesn't exist. (R2 P2 finding, alpha.3.)
+    local oodc_ts; oodc_ts="$(date +%s)"
+    warn "  ~/.claude/plugins/oodc/ already exists — backing up to oodc.bak.${oodc_ts}"
+    mv "$oodc_dst" "${oodc_dst}.bak.${oodc_ts}"
   fi
 
   mkdir -p "$oodc_dst"
@@ -429,12 +433,14 @@ phase3_settings_json() {
 
   if [[ ! -f "$settings_template" ]]; then
     warn "Phase 3: settings.json.template not found — skipping"
+    rm -f "$tmp_merged"
     return 0
   fi
 
   # Ensure jq is available (Phase 3 requires it)
   if ! command -v jq &>/dev/null; then
     warn "Phase 3: jq not available — skipping settings.json merge"
+    rm -f "$tmp_merged"
     return 0
   fi
 
@@ -633,7 +639,10 @@ phase5_health_check() {
   fi
 
   echo "  [e] §harness mode contract present in global CLAUDE.md"
-  if [[ -f "$global_claude" ]] && grep -q "harness mode" "$global_claude" 2>/dev/null; then
+  # Use the canonical sentinel "## §harness mode" (matches Phase 2 idempotency
+  # check). The weaker substring "harness mode" false-passed on any CLAUDE.md
+  # mentioning harness mode in prose. (R2 P2 finding, alpha.3.)
+  if [[ -f "$global_claude" ]] && grep -q "## §harness mode" "$global_claude" 2>/dev/null; then
     success "    [e] §harness mode contract found in CLAUDE.md"
     (( pass++ )) || true
   else

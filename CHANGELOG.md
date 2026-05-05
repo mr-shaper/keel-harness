@@ -7,6 +7,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.3] — 2026-05-04 — Romeo R2 audit fix (6 findings, 0 P0/P1)
+
+### Fixed
+
+- 🟡 **P2 (Romeo R2 NEW finding — `tests/test-install.sh:113,140,174,220`)**: cases
+  3, 4, 5, 6 lacked the same hermetic `cd "$project_dir"` isolation that alpha.2 added
+  to the sister file `test-install-claude-md-safety.sh`. The alpha.2 P1 fix solved the
+  problem in the wrong scope — sister-file regression. Cases passed only because the
+  repo's own `CLAUDE.md` contains `## §harness mode` (silent idempotent-skip on
+  Phase 2b). Would surface as hard test failure on a clone with the sentinel stripped.
+  Fixed: all 4 cases now allocate a `project_dir="${ws}/project"` and run install via
+  `cd "$project_dir" && bash "$INSTALL" ...` subshell, matching the sister file's
+  alpha.2 fix.
+
+- 🟡 **P2 (Romeo R2 NEW finding — `.github/workflows/tests.yml:77-95`)**: CI step
+  for `test-install-claude-md-safety.sh` (and sibling `test-red-team.sh`) used a
+  `if [[ -f tests/<file> ]]` soft guard. Deleting/renaming the test file → CI prints
+  "not found, skipping" and exits 0 = silently green. The entire safety suite could
+  vanish without a CI failure signal. Fixed: replaced both soft-guarded blocks with
+  hard `bash tests/<file>` registration. Sister-file preempt applied to
+  `test-red-team.sh` for the same reason.
+
+- 🟡 **P2 (Romeo R1 deferred, R2 confirmed — `install.sh:284-289`)**: OODC backup
+  TOCTOU. `$(date +%s)` was evaluated twice (warn message + mv path). On a slow
+  system or under I/O pressure, a Unix-second boundary could leave the warn line
+  pointing at a path that doesn't exist. Fixed: capture `oodc_ts="$(date +%s)"` once,
+  reuse on both lines.
+
+- 🟡 **P2 (Romeo R1 deferred, R2 confirmed — `install.sh:644`)**: Phase 5 health
+  check element [e] used the weak substring `grep -q "harness mode"` while Phase 2's
+  canonical idempotency sentinel is `## §harness mode`. Any `CLAUDE.md` mentioning
+  the phrase in prose (e.g., a trigger-condition comment) would false-pass element
+  [e]. Fixed: tightened to `grep -q "## §harness mode"` matching Phase 2.
+
+- 🔵 **P3 (Romeo R2 NEW finding — `install.sh:432,438`)**: Phase 3 settings.json
+  merge function created `$tmp_merged` via `mktemp` at the top, but two early-return
+  guards (`settings_template not found`, `jq not available`) returned without
+  cleaning up. Every install on a system missing the template or `jq` leaked one
+  `/tmp/harness-settings-merged-XXXXXX.json` file. Fixed: added `rm -f "$tmp_merged"`
+  to both early-return paths.
+
+- 🔵 **P3 (Romeo R2 NEW finding — `tests/test-install-claude-md-safety.sh:245`)**:
+  Comment in case 5 said "N for global CLAUDE.md, N for project CLAUDE.md" but the
+  actual stdin routing was: claude_home has no CLAUDE.md → Phase 2a hits Branch 1
+  (no prompt) → first N answers Phase 2b → second N answers Phase 3. Test worked
+  correctly; only the comment misled the reader. Fixed: rewrote comment to reflect
+  actual prompt routing.
+
+### Verification
+
+- All 6 test suites PASS (`test-install.sh` 22/22, `test-install-claude-md-safety.sh`
+  14/14, `test-pre-commit.sh` 7/7, `test-red-team.sh` 8/8, `test-manifest-completeness.sh`
+  2/2, `test-sync.sh` 15/15) — total 68/68 assertions.
+- Live dogfood 3/3 PASS on alpha.3 (Case A fresh install, Case B Branch 3
+  backup-then-append, Case C `--dry-run` zero writes). Real `~/.claude/` invariant
+  held — newest backup age 13239s (3.6h, pre-session) confirms no pollution.
+- Phase 5 [e] now reports `5/5 elements OK` with the strict `## §harness mode` sentinel.
+- OODC re-install warn message and `oodc.bak.<ts>` directory share single timestamp
+  `1777954461` (proves single `oodc_ts` capture works).
+
+### Audit closure
+
+- Romeo R2 6 findings: **6/6 fixed** in alpha.3 (4 P2 + 2 P3, 0 P0/P1).
+- ROADMAP.md v0.1.1 P2/P3 items: **2 closed** (OODC TOCTOU + Phase 5 sentinel —
+  R1-deferred items now patched here instead of v0.1.1).
+
+---
+
 ## [0.1.0-alpha.2] — 2026-05-04 — Romeo R1 audit fix (test rigor + CI gate)
 
 ### Fixed
@@ -299,7 +367,8 @@ matrix, demo recordings, and private-data sanitization.
 
 ---
 
-[Unreleased]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha.2...HEAD
+[Unreleased]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha.3...HEAD
+[0.1.0-alpha.3]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha.2...v0.1.0-alpha.3
 [0.1.0-alpha.2]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha...v0.1.0-alpha.1
 [0.1.0-alpha]: https://github.com/mr-shaper/keel-harness/releases/tag/v0.1.0-alpha

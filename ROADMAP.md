@@ -37,16 +37,18 @@ land here.
   installed kernel file's hash differs from the template's hash, and
   prompts before overwriting.
 
-- **[Romeo R1 P2] OODC backup TOCTOU.** `install.sh` lines 284-285: `$(date +%s)`
+- ~~**[Romeo R1 P2] OODC backup TOCTOU.** `install.sh` lines 284-285: `$(date +%s)`
   evaluated separately in the `warn` message vs the `mv` path. On slow systems or under
   I/O pressure the timestamps can differ by 1 second, leaving the warn message pointing
-  to a path that doesn't exist. Fix: assign `oodc_ts="$(date +%s)"` once and reuse.
+  to a path that doesn't exist. Fix: assign `oodc_ts="$(date +%s)"` once and reuse.~~
+  → ✅ **Fixed in v0.1.0-alpha.3** (Romeo R2 confirmed; single `oodc_ts` capture)
 
-- **[Romeo R1 P2] Phase 5 health check sentinel weaker than Phase 2.** `install.sh`
+- ~~**[Romeo R1 P2] Phase 5 health check sentinel weaker than Phase 2.** `install.sh`
   line ~636: Phase 5 grep checks `"harness mode"` while the Phase 2 idempotency check
   uses `"## §harness mode"`. A `CLAUDE.md` containing the substring elsewhere (e.g., in
   a trigger-condition comment) makes Phase 5 falsely report PASS. Fix: align both checks
-  to `"## §harness mode"`.
+  to `"## §harness mode"`.~~
+  → ✅ **Fixed in v0.1.0-alpha.3** (Romeo R2 confirmed; sentinel tightened to `## §harness mode`)
 
 - **[Romeo R1 P2] CHANGELOG link references missing.** `CHANGELOG.md` uses
   Keep-a-Changelog headings like `## [0.1.0-alpha.1]` but previously lacked the

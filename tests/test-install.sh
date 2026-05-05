@@ -106,11 +106,15 @@ test_phase2_claude_md_global_new() {
   echo "[3] test_phase2_claude_md_global_new: CLAUDE.md absent → cp template"
   local ws; ws="$(new_workspace)"
   local claude_home="${ws}/claude-home"
-  mkdir -p "$claude_home"
+  local project_dir="${ws}/project"
+  mkdir -p "$claude_home" "$project_dir"
   # Do NOT create CLAUDE.md — test the "not found" path
 
+  # cd into hermetic project_dir so install.sh Phase 2b targets a clean PWD,
+  # not the test-runner's repo root. (R2 P2 finding, sister-file isolation gap.)
   local output
   output=$(
+    cd "$project_dir" && \
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
@@ -132,12 +136,15 @@ test_phase2_claude_md_global_merge() {
   echo "[4] test_phase2_claude_md_global_merge: CLAUDE.md exists + Y → append harness contract"
   local ws; ws="$(new_workspace)"
   local claude_home="${ws}/claude-home"
-  mkdir -p "$claude_home"
+  local project_dir="${ws}/project"
+  mkdir -p "$claude_home" "$project_dir"
   echo "# Existing CLAUDE.md content" > "${claude_home}/CLAUDE.md"
 
   local output
   # Input: Y for CLAUDE.md merge, N for settings.json
+  # cd into hermetic project_dir so Phase 2b targets clean PWD. (R2 P2 finding.)
   output=$(
+    cd "$project_dir" && \
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
@@ -166,12 +173,15 @@ test_phase2_claude_md_global_skip() {
   echo "[5] test_phase2_claude_md_global_skip: CLAUDE.md exists + N → skip + warning"
   local ws; ws="$(new_workspace)"
   local claude_home="${ws}/claude-home"
-  mkdir -p "$claude_home"
+  local project_dir="${ws}/project"
+  mkdir -p "$claude_home" "$project_dir"
   echo "# Original content only" > "${claude_home}/CLAUDE.md"
 
   local output
   # Input: N for CLAUDE.md merge, N for settings.json
+  # cd into hermetic project_dir so Phase 2b targets clean PWD. (R2 P2 finding.)
   output=$(
+    cd "$project_dir" && \
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \
@@ -201,7 +211,8 @@ test_phase3_settings_merge() {
   echo "[6] test_phase3_settings_merge: user theme preserved + harness hooks added"
   local ws; ws="$(new_workspace)"
   local claude_home="${ws}/claude-home"
-  mkdir -p "$claude_home"
+  local project_dir="${ws}/project"
+  mkdir -p "$claude_home" "$project_dir"
 
   # Create existing CLAUDE.md so phase2 prompts (N → skip), then phase3 prompts (Y → merge)
   echo "# Existing CLAUDE.md" > "${claude_home}/CLAUDE.md"
@@ -216,8 +227,10 @@ test_phase3_settings_merge() {
 EOF
 
   # Input: N for CLAUDE.md merge (phase2), Y for settings.json merge (phase3)
+  # cd into hermetic project_dir so Phase 2b targets clean PWD. (R2 P2 finding.)
   local output
   output=$(
+    cd "$project_dir" && \
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \
     CLAUDE_HOME="$claude_home" \

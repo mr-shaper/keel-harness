@@ -242,7 +242,9 @@ EOF
   local pre_hash
   pre_hash="$(file_md5 "${project_dir}/CLAUDE.md")"
 
-  # Simulate: N for global CLAUDE.md (so global doesn't interfere), N for project CLAUDE.md.
+  # claude_home has no CLAUDE.md, so Phase 2a hits Branch 1 (new install — no prompt).
+  # First N answers Phase 2b project CLAUDE.md prompt (Branch 3); second N answers Phase 3
+  # settings.json prompt. (R2 P3 finding: prior comment misidentified which prompt got 1st N.)
   ( cd "$project_dir" && \
     INSTALL_DRY_RUN=0 \
     HARNESS_HOME="${ws}/harness-home" \

@@ -74,24 +74,15 @@ jobs:
           bash tests/test-install.sh
         shell: bash
 
-      - name: Run test-install-claude-md-safety.sh (if exists)
-        run: |
-          if [[ -f tests/test-install-claude-md-safety.sh ]]; then
-            echo "==> Running test-install-claude-md-safety.sh"
-            bash tests/test-install-claude-md-safety.sh
-          else
-            echo "==> tests/test-install-claude-md-safety.sh not found, skipping"
-          fi
+      # Hard registration: deleting/renaming the test file MUST fail CI loudly,
+      # not silently green via "if exists" soft guard. (R2 P2 finding, alpha.3;
+      # also applied to test-red-team.sh as sister-file regression preempt.)
+      - name: Run test-install-claude-md-safety.sh
+        run: bash tests/test-install-claude-md-safety.sh
         shell: bash
 
-      - name: Run test-red-team.sh (if exists)
-        run: |
-          if [[ -f tests/test-red-team.sh ]]; then
-            echo "==> Running test-red-team.sh"
-            bash tests/test-red-team.sh
-          else
-            echo "==> tests/test-red-team.sh not found, skipping"
-          fi
+      - name: Run test-red-team.sh
+        run: bash tests/test-red-team.sh
         shell: bash
 
       - name: Run test-manifest-completeness.sh
