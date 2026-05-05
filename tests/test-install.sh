@@ -87,9 +87,12 @@ test_phase1_cp() {
 
   # Manifest must be 100% complete — no source files should be missing.
   # (Invert the old vaporware-era assertion: any "missing" warning is a failure.)
+  # Match only the literal Phase 1 missing-source WARN; do NOT match generic
+  # "skipping" string — install.sh v0.1.0-alpha.1 introduced "skipping (idempotent)"
+  # in Phase 2a/2b output which would false-positive trip this check.
   local kf_count
   kf_count=$(jq '.kernel_files | length' "${REPO_ROOT}/manifest.json")
-  if echo "$output" | grep -q "Source file not found\|skipping"; then
+  if echo "$output" | grep -q "Source file not found"; then
     fail "test_phase1_cp (no-missing)" "Unexpected WARN about missing source files — manifest must be 100% complete"
   else
     pass "test_phase1_cp (manifest ${kf_count}/${kf_count} complete, 0 WARN)"

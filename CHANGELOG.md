@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.2] — 2026-05-04 — Romeo R1 audit fix (test rigor + CI gate)
+
+### Fixed
+
+- 🔴 **P1 (Romeo R1 finding)**: `tests/test-install-claude-md-safety.sh` cases 1, 3, 4
+  lacked hermetic isolation — they invoked `install.sh` without cd-ing into a temp
+  project dir, so `install.sh` Phase 2b targeted the test runner's working directory.
+  Cases passed only because the repo's own `CLAUDE.md` happened to contain the harness
+  marker (idempotent-skip path). The tests provided false confidence: they did not
+  actually verify Phase 2b behavior. Fixed: cases 1, 3, 4 now use the same
+  `( cd "$project_dir" && bash install.sh ... )` subshell pattern as cases 2 and 5.
+- 🔴 **P1 (Romeo R1 finding)**: `tests/test-install-claude-md-safety.sh` was not
+  registered in `.github/workflows/tests.yml`. CI never ran the new suite on push or
+  PR. Fixed: added explicit "Run test-install-claude-md-safety.sh" step to the
+  existing matrix job.
+- 🔴 **P1 (deterministic regression discovered during alpha.2 P9 verify)**:
+  v0.1.0-alpha.1's new `install.sh` Phase 2a/2b idempotent-skip branch outputs
+  `"skipping (idempotent)"`, which collided with `tests/test-install.sh` line 92's
+  over-broad regex `"Source file not found\|skipping"`. Result: test-install
+  reported `21 PASS / 1 FAIL` on any host where `$PWD/CLAUDE.md` already contained
+  the harness marker. Root cause of P9's false-positive "test pass" claim during
+  alpha.1 ship (caught only after CEO challenged). Fixed: tightened grep to literal
+  `"Source file not found"` only, with an explanatory comment for future maintainers.
+
+### Verification
+
+- All 6 test cases now run with hermetic isolation (zero pollution in repo root after
+  suite run, verified via `git status`).
+- CI matrix (macOS + Ubuntu) now executes the new test suite on every push.
+- All 6 test suites + new test PASS locally.
+
+### Deferred to v0.1.1 (Romeo R1 P2/P3 findings)
+
+- OODC backup TOCTOU: `$(date +%s)` evaluated twice may mismatch by one second between
+  warn message and mv path
+- Phase 5 health check sentinel weaker than Phase 2 (`harness mode` vs `## §harness mode`)
+- CHANGELOG missing link reference for [0.1.0-alpha.1] heading
+- Release notes for v0.1.0-alpha.1 mentioned a "re-run after partial install" case that
+  doesn't exist
+- Sentinel rename fragility (P3 — any future header rename silently breaks idempotency)
+- CI registration discipline (P3 — formalize as gate)
+
+---
+
 ## [0.1.0-alpha.1] — 2026-05-04 — User-safety hotfix
 
 ### Fixed
@@ -255,5 +299,7 @@ matrix, demo recordings, and private-data sanitization.
 
 ---
 
-[Unreleased]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha...HEAD
+[Unreleased]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha.2...HEAD
+[0.1.0-alpha.2]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
+[0.1.0-alpha.1]: https://github.com/mr-shaper/keel-harness/compare/v0.1.0-alpha...v0.1.0-alpha.1
 [0.1.0-alpha]: https://github.com/mr-shaper/keel-harness/releases/tag/v0.1.0-alpha

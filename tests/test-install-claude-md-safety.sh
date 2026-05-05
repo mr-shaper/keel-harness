@@ -42,14 +42,18 @@ cleanup() { rm -rf "$1"; }
 case_new_global() {
   echo "[1] case_new_global: empty CLAUDE_HOME → CLAUDE.md created from template"
   local ws; ws="$(new_workspace)"
+  local project_dir="${ws}/project"
   local claude_home="${ws}/claude-home"
-  mkdir -p "$claude_home"
+  mkdir -p "$project_dir" "$claude_home"
   # No CLAUDE.md present — testing the "new install" path.
+  # Run from isolated project_dir so Phase 2b targets $project_dir/CLAUDE.md, not repo root.
 
-  INSTALL_DRY_RUN=0 \
-  HARNESS_HOME="${ws}/harness-home" \
-  CLAUDE_HOME="$claude_home" \
-  bash "$INSTALL" --skip-deps-check <<< $'n\n' &>/dev/null || true
+  ( cd "$project_dir" && \
+    INSTALL_DRY_RUN=0 \
+    HARNESS_HOME="${ws}/harness-home" \
+    CLAUDE_HOME="$claude_home" \
+    bash "$INSTALL" --skip-deps-check <<< $'n\n' &>/dev/null || true
+  )
 
   if [[ -f "${claude_home}/CLAUDE.md" ]]; then
     pass "case_new_global (CLAUDE.md created)"
@@ -99,8 +103,9 @@ case_new_project() {
 case_existing_global_idempotent_skip() {
   echo "[3] case_existing_global_idempotent_skip: already has harness section → skip, no backup"
   local ws; ws="$(new_workspace)"
+  local project_dir="${ws}/project"
   local claude_home="${ws}/claude-home"
-  mkdir -p "$claude_home"
+  mkdir -p "$project_dir" "$claude_home"
 
   # Pre-populate with content that already contains the harness sentinel.
   cat > "${claude_home}/CLAUDE.md" <<'EOF'
@@ -116,10 +121,13 @@ EOF
   local pre_hash
   pre_hash="$(file_md5 "${claude_home}/CLAUDE.md")"
 
-  INSTALL_DRY_RUN=0 \
-  HARNESS_HOME="${ws}/harness-home" \
-  CLAUDE_HOME="$claude_home" \
-  bash "$INSTALL" --skip-deps-check <<< $'n\n' &>/dev/null || true
+  # Run from isolated project_dir so Phase 2b targets $project_dir/CLAUDE.md, not repo root.
+  ( cd "$project_dir" && \
+    INSTALL_DRY_RUN=0 \
+    HARNESS_HOME="${ws}/harness-home" \
+    CLAUDE_HOME="$claude_home" \
+    bash "$INSTALL" --skip-deps-check <<< $'n\n' &>/dev/null || true
+  )
 
   local post_hash
   post_hash="$(file_md5 "${claude_home}/CLAUDE.md")"
@@ -151,8 +159,9 @@ EOF
 case_existing_global_backup_then_append_Y() {
   echo "[4] case_existing_global_backup_then_append_Y: custom content + Y → backup + append"
   local ws; ws="$(new_workspace)"
+  local project_dir="${ws}/project"
   local claude_home="${ws}/claude-home"
-  mkdir -p "$claude_home"
+  mkdir -p "$project_dir" "$claude_home"
 
   # Pre-populate with custom user content, no harness section.
   cat > "${claude_home}/CLAUDE.md" <<'EOF'
@@ -165,10 +174,13 @@ EOF
   pre_hash="$(file_md5 "${claude_home}/CLAUDE.md")"
 
   # Simulate: Y for global CLAUDE.md prompt, N for settings.json prompt.
-  INSTALL_DRY_RUN=0 \
-  HARNESS_HOME="${ws}/harness-home" \
-  CLAUDE_HOME="$claude_home" \
-  bash "$INSTALL" --skip-deps-check <<< $'Y\nN\n' &>/dev/null || true
+  # Run from isolated project_dir so Phase 2b targets $project_dir/CLAUDE.md, not repo root.
+  ( cd "$project_dir" && \
+    INSTALL_DRY_RUN=0 \
+    HARNESS_HOME="${ws}/harness-home" \
+    CLAUDE_HOME="$claude_home" \
+    bash "$INSTALL" --skip-deps-check <<< $'Y\nN\n' &>/dev/null || true
+  )
 
   # (a) Backup file must exist with original content.
   local backup_file

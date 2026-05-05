@@ -37,6 +37,40 @@ land here.
   installed kernel file's hash differs from the template's hash, and
   prompts before overwriting.
 
+- **[Romeo R1 P2] OODC backup TOCTOU.** `install.sh` lines 284-285: `$(date +%s)`
+  evaluated separately in the `warn` message vs the `mv` path. On slow systems or under
+  I/O pressure the timestamps can differ by 1 second, leaving the warn message pointing
+  to a path that doesn't exist. Fix: assign `oodc_ts="$(date +%s)"` once and reuse.
+
+- **[Romeo R1 P2] Phase 5 health check sentinel weaker than Phase 2.** `install.sh`
+  line ~636: Phase 5 grep checks `"harness mode"` while the Phase 2 idempotency check
+  uses `"## §harness mode"`. A `CLAUDE.md` containing the substring elsewhere (e.g., in
+  a trigger-condition comment) makes Phase 5 falsely report PASS. Fix: align both checks
+  to `"## §harness mode"`.
+
+- **[Romeo R1 P2] CHANGELOG link references missing.** `CHANGELOG.md` uses
+  Keep-a-Changelog headings like `## [0.1.0-alpha.1]` but previously lacked the
+  corresponding `[0.1.0-alpha.1]: <url>` definitions at file bottom. Fixed partially in
+  `v0.1.0-alpha.2` (alpha.2 and alpha.1 refs added); full audit of all bracketed
+  headings and the `[Unreleased]` compare URL should be verified and locked down.
+
+- **[Romeo R1 P2] Release notes case description mismatch.** The GitHub release body
+  for `v0.1.0-alpha.1` claims a "re-run after partial install" test case that does not
+  exist in the shipped suite. Fix: edit the GitHub release body to remove the fictitious
+  case and replace it with an accurate enumeration of the 6 real cases.
+
+- **[Romeo R1 P3] Sentinel rename fragility.** `install.sh` uses the plain string
+  `## §harness mode` as the idempotency gate. Any future header rename (e.g., to
+  `## §keel-harness mode` in a brand sweep) silently breaks idempotency, causing
+  repeated section appends on re-install. Fix: add a machine-readable comment marker
+  (e.g., `<!-- harness-section:v1 -->`) on a dedicated line, or centralize the sentinel
+  as a named constant.
+
+- **[Romeo R1 P3] CI registration discipline gate.** New test files added without a
+  corresponding `tests.yml` step are silent no-ops — as demonstrated by the alpha.1
+  test suite omission caught in Romeo R1. Fix: add a CI step that asserts every
+  `tests/test-*.sh` has a matching `Run` step in `tests.yml`, so the gap cannot recur.
+
 - **Stale file counts in install.sh, tests/test-install.sh, README.md.**
   Several places hardcode `29 kernel_files` or `23 kernel files` or
   `8 enforce-core hooks (~80 LOC)`. The actual numbers are 50, 50, and
@@ -244,6 +278,12 @@ get forgotten:
 | Binary file blacklist scan silently false-negative | Audit-A | v0.1.1 |
 | `templates/` blanket SKIP_PATHS | Audit-A | v0.1.1 |
 | `_harness_hooks_count` hardcoded integer | Audit-B | v0.1.1 |
+| OODC backup TOCTOU (`date +%s` double-eval) | Romeo R1 P2 | v0.1.1 |
+| Phase 5 health check sentinel weaker than Phase 2 | Romeo R1 P2 | v0.1.1 |
+| CHANGELOG link references missing | Romeo R1 P2 | v0.1.1 |
+| Release notes fictitious case description | Romeo R1 P2 | v0.1.1 |
+| Sentinel rename fragility (idempotency gate) | Romeo R1 P3 | v0.1.1 |
+| CI registration discipline gate | Romeo R1 P3 | v0.1.1 |
 | OODC slow-loop multi-source research is private | inherent | v0.4 |
 | OODC orient experts depend on private skills | inherent | v0.4 |
 | OODC state machine hook not bundled | `oodc-loop.md` | v0.4 |
