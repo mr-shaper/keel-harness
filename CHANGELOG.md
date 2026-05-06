@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.5] — 2026-05-06 — P0 hotfix: PCT gate threshold 70 → 50
+
+### Fixed
+
+- 🔴 **P0 — `hooks/stop-handoff-writer.sh:64`**: the alpha.4 default
+  `HARNESS_HANDOFF_PCT_THRESHOLD=70` was empirically wrong. Real-session
+  reproduction: Claude UI displayed 71% context while the hook's
+  `ctx-monitor` measured 53–58% on the same session (~18% gap — the hook
+  follows the upstream claude-hud `getTotalTokens` formula `cache_read +
+  cache_creation + input` and intentionally excludes `output_tokens` and
+  tooling/system overhead, both of which Claude UI does count). The 70%
+  gate therefore never fired in practice; every Stop event hit `SKIP
+  ctx=53% < threshold=70%` and the handoff was perpetually skipped,
+  defeating the entire feature. Lowered the default to **50** so the gate
+  preserves a ~20% buffer below observed real-session ctx% and fires
+  reliably. The `HARNESS_HANDOFF_PCT_THRESHOLD` environment-variable
+  override remains available for users with an unusual mix.
+
+### Why this matters
+
+- alpha.4 shipped a feature that was, in real sessions, indistinguishable
+  from no feature at all — the gate was set above the real ceiling. Users
+  installing alpha.4 saw long sessions but no handoff churn reduction
+  *and* no handoff being written when context was actually high — both
+  worse than the alpha.3 baseline (which always wrote a handoff).
+- The bug was caught via dogfood by a downstream user (spiritual-jewelry-dtc
+  S0 sprint) who reported `Claude UI 71% but harness hook never fires`.
+
+### Compound takeaway (R12)
+
+Any hook PCT gate (e.g. context-monitor / token-monitor / heartbeat-monitor)
+must satisfy three constraints before ship:
+
+1. **Verify against the user-visible PCT** in a real session — `gap > 5%`
+   between hook math and UI math is a fix-blocking signal.
+2. **Keep ≥20% buffer** below the observed real-session ctx% rather than
+   hard-coding the boundary itself (50% default with a 1M window survives
+   any realistic Claude-UI-vs-hook gap).
+3. **Fresh-terminal verification before completion** — a code-level test
+   passing is necessary but not sufficient; the hook must be observed
+   firing in a fresh session before the fix is considered shipped.
+
+Recorded as cross-sprint rule R12 in
+`patterns/decisions/2026-05-06-harness-context-monitor-threshold-p0-fix-decision.md`.
+
+### Verification
+
+- All 7 `tests/test-context-aware-handoff.sh` cases continue to PASS — the
+  test fixtures supply explicit ctx values (30, 60, 75) on either side of
+  both the old (70) and new (50) defaults, so no test needed updating.
+- All 6 baseline test suites still PASS (75/75 total assertions).
+
+---
+
 ## [0.1.0-alpha.4] — 2026-05-05 — Context-aware handoff (PCT gate + model-aware WINDOW)
 
 ### Added

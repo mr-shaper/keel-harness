@@ -57,11 +57,22 @@ if [[ ! -d "${HARNESS_DIR}" ]]; then
   exit 0
 fi
 
-# ── Context-aware gate (alpha.4) ─────────────────────────────────────────────
-# Skip handoff when context% < threshold (default 70). Reads latest pct from
+# ── Context-aware gate (alpha.4 + alpha.5 P0 threshold fix) ─────────────────
+# Skip handoff when context% < threshold (default 50). Reads latest pct from
 # .harness/hook-trace.log (post-tool-context-monitor writes it). Empty / missing
 # trace → fallback to original write path (safe side, never lose a handoff).
-HARNESS_HANDOFF_PCT_THRESHOLD="${HARNESS_HANDOFF_PCT_THRESHOLD:-70}"
+#
+# alpha.5 P0 fix: lowered default 70 → 50 after a real-session reproduction:
+# Claude UI showed 71% context but the hook's ctx-monitor measured 53–58%
+# (gap of ~18% — the hook computes input + cache, while Claude UI also
+# accounts for tooling/system overhead). The 70% gate therefore never fired
+# and handoff was perpetually skipped, defeating the feature. The new default
+# preserves a ~20% buffer below observed real-session ctx%, so the gate fires
+# in practice. See R12 (KB patterns/decisions/2026-05-06-harness-context-monitor-threshold-p0-fix-decision.md):
+# any hook PCT gate (1) must be verified against the user-visible PCT,
+# (2) should keep ≥20% buffer below observed real ctx%, and (3) needs a
+# fresh-terminal verification after ship — not just a code-level test.
+HARNESS_HANDOFF_PCT_THRESHOLD="${HARNESS_HANDOFF_PCT_THRESHOLD:-50}"
 HARNESS_FORCE_FLAG="${HARNESS_DIR}/handoff-force.flag"
 HOOK_TRACE="${HARNESS_DIR}/hook-trace.log"
 NOW_TS="$(date '+%Y-%m-%dT%H:%M:%S%z')"
