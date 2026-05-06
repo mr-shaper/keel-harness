@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.7] — 2026-05-06 — PROJECT_STATE size-gate forcing function (R15 three-piece + L44 candidate)
+
+### Added
+
+- ✨ **`hooks/post-tool-project-state-size-gate.sh`**: new alert-only
+  PostToolUse hook that watches `PROJECT_STATE.md` size on every
+  Write/Edit/MultiEdit. When the file passes 180 LOC (the alert
+  threshold; the contract's hard cap is 200), the hook emits a
+  `[SIZE-GATE-ALERT]` line to stderr and appends to `.harness/alert.log`
+  and `.harness/hook-trace.log`. Exit code is always 0 — the hook
+  *informs* the user, it never blocks the Write. (L43: alert-only,
+  matcher is a literal whitelist, never `*`.)
+
+- ✨ **`templates/PROJECT_STATE.md.template`**: a starter template for a
+  harness project's backbone file. Ships with the inline `BACKBONE-FROZEN`
+  HTML comment, a `size-contract:` frontmatter block, and the seven
+  standard anchors (Identity, Current sprint, Live decisions, Stable
+  anchors, Sprint history index, Constraints, Open backlog) so a new
+  project starts compliant with R15.
+
+- ✨ **`docs/sprint-history-spec.md`**: convention for collapsing old
+  sprint detail out of `PROJECT_STATE.md` into single-file partitions
+  under `.harness/sprint-history/sNN-<topic-slug>.md`. Defines the
+  filename convention, frontmatter template, `sha256sums.txt` integrity
+  workflow, README index, and the manual collapse workflow that is
+  triggered when the size-gate alert fires.
+
+- ✨ **`docs/r15-and-l44-candidate.md`**: documents the R15 three-piece
+  pattern (inline size contract + forcing-function hook + canonical-md5
+  baseline) and the L44 Cat-H candidate that captures the rule for
+  ratification once the v1.13 freeze lifts. Explains why each of the
+  three pieces fails alone, the sibling-rule family
+  (L23 / L31 / L41 / L43 + R12 third constraint), and a recipe for
+  applying the pattern to future backbone files.
+
+### Changed
+
+- 🔧 **`templates/settings.json.template`**: registered the new hook as a
+  PostToolUse entry with an explicit `Write|Edit|MultiEdit` matcher
+  (5-second timeout). Bumped `_harness_hooks_count` 10 → 11.
+
+- 🔧 **`manifest.json`**: added the new hook
+  (`hooks/post-tool-project-state-size-gate.sh`) and the new template
+  (`templates/PROJECT_STATE.md.template`) to `kernel_files[]` so
+  `install.sh` Phase 1 ships both.
+
+### Why this matters
+
+Long-running harness projects accumulate detail in the same backbone file
+(`PROJECT_STATE.md`) — across decisions, sprints, and contributors —
+and that file routinely outgrows readability. Documented size limits
+without enforcement get ignored; enforced limits without a documented
+contract feel arbitrary. R15 binds the two: the file declares its own
+contract, the hook enforces it, and a baseline md5 anchors the contract
+against silent drift.
+
+In real deployment of the upstream harness this hook fired correctly on
+a 196-LOC `PROJECT_STATE.md` belonging to a downstream user project — a
+cross-project verification that the size-gate behaves the same on a
+foreign `.harness/` tree as it does on its own.
+
+### L43 compliance note
+
+The matcher in `settings.json.template` is a literal whitelist:
+`"matcher": "Write|Edit|MultiEdit"`. It is **not** `"*"`. A `*` matcher
+would let this hook fire on every tool call and risks self-locking the
+session if the hook ever degrades. The internal file-path filter (only
+fire when the path contains `PROJECT_STATE.md`) keeps the work
+proportional even within the whitelist.
+
+### Verification
+
+- All 7 e2e cases continue to PASS.
+- All 6 baseline test suites still PASS (75/75 total).
+- New hook tested via mock JSON fixture: a 200-LOC dummy
+  `PROJECT_STATE.md` produced `[SIZE-GATE-ALERT] PROJECT_STATE.md = 200
+  LOC > 180 threshold (200 hard cap)` on stderr, exit code 0. Files
+  below threshold (e.g. 50 LOC) emit no alert and exit 0.
+
+---
+
 ## [0.1.0-alpha.6] — 2026-05-06 — Symmetric FIRE/SKIP trace (R12 verifiability fix)
 
 ### Added

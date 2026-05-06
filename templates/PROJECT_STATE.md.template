@@ -1,0 +1,66 @@
+<!-- BACKBONE-FROZEN s0 | size-contract: ≤200 LOC ≤25k bytes | alert-threshold: 180 LOC | canonical-md5: <pending> | last-touched: YYYY-MM-DD -->
+---
+project: <PROJECT_NAME>
+created: YYYY-MM-DD
+backbone-frozen: true
+size-contract:
+  max-loc: 200
+  max-bytes: 25000
+  alert-threshold-loc: 180
+---
+
+# <PROJECT_NAME> — Project State
+
+> **BACKBONE-FROZEN file** (R15 three-piece pattern). Do not let this file
+> grow beyond ~200 LOC. Old sprint detail collapses into
+> `.harness/sprint-history/sNN-<topic-slug>.md` partitions; this file holds
+> only the still-live decisions, the current sprint pointer, and stable
+> anchors. See `docs/r15-and-l44-candidate.md`.
+
+---
+
+## §1 Identity
+
+- **Project name**: <PROJECT_NAME>
+- **One-line goal**: <fill in>
+- **Type**: <Skill / MCP / WebApp / CLI / Library / APP>
+- **Visibility**: <public / private>
+
+## §2 Current sprint
+
+- **Active sprint**: sNN
+- **Phase**: <0 启动 / 1 探索 / 2 收敛 / 3 开发 / 4 收尾>
+- **Owner**: <P9 / P8 / inline>
+
+## §3 Live decisions (still authoritative)
+
+- (1-line bullet per decision; collapse old ones into sprint-history/)
+
+## §4 Stable anchors
+
+- Plan MD: `docs/plans/<latest>.md`
+- Last handoff: `.harness/handoff-sN-to-sN+1.md`
+- KB decision: `iCloud KB patterns/decisions/<latest>.md`
+
+## §5 Sprint history index
+
+| Sprint | Topic | File |
+|--------|-------|------|
+| s0     | (kickoff) | `.harness/sprint-history/s0-kickoff.md` |
+| ...    | ...   | ...  |
+
+## §6 Constraints (still in force)
+
+- (3-5 bullets, the live constraints — drop expired ones into history)
+
+## §7 Open backlog
+
+- (3-5 bullets, the actionable backlog — drop closed items into history)
+
+---
+
+> **Size discipline**: this file should stay ≤200 LOC. The
+> `post-tool-project-state-size-gate.sh` hook fires at 180 LOC with a
+> `[SIZE-GATE-ALERT]`. When that fires, collapse §3/§5 into a new
+> `sprint-history/sNN-<topic-slug>.md` and prune this file back under the
+> threshold.
