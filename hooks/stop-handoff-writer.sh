@@ -103,6 +103,17 @@ else
   # CTX_PCT empty (cold start / race / non-numeric) → fallback to original write path
 fi
 
+# ── alpha.6: write FIRE trace symmetric to SKIP ───────────────────────────────
+# Without this, hook-trace.log only recorded SKIP entries (alpha.4/5); a user
+# running `grep stop-handoff .harness/hook-trace.log` after a fresh-terminal
+# Stop event would see zero hits when the gate fired and falsely conclude the
+# hook never ran. Recording both FIRE and SKIP makes the third constraint of
+# R12 (fresh-terminal verify-before-completion) directly observable —
+# patterns/decisions/2026-05-06-harness-context-monitor-threshold-p0-fix-decision.md.
+printf '[%s] stop-handoff: FIRE ctx=%s%% >= threshold=%s%%\n' \
+  "${NOW_TS}" "${CTX_PCT:-empty}" "${HARNESS_HANDOFF_PCT_THRESHOLD}" \
+  >> "${HOOK_TRACE}" 2>/dev/null || true
+
 # ── Collect fields ────────────────────────────────────────────────────────────
 SESSION_ID="$(parse_session_id "${PAYLOAD}")"
 TRIGGER="stop"

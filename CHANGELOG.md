@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.6] — 2026-05-06 — Symmetric FIRE/SKIP trace (R12 verifiability fix)
+
+### Added
+
+- 🔧 **`hooks/stop-handoff-writer.sh:103-110`**: emit a `FIRE` trace line in
+  `.harness/hook-trace.log` when the PCT gate passes, symmetric to the
+  existing `SKIP` line. alpha.4 and alpha.5 only wrote a trace when the gate
+  *skipped* the handoff. After a real-session Stop event, a user running
+  `grep stop-handoff .harness/hook-trace.log` would see zero entries when
+  the gate had actually fired correctly, and falsely conclude the hook never
+  ran. The third constraint of R12 (fresh-terminal verify-before-completion)
+  was unobservable on the success path.
+
+### Why this matters
+
+R12 says "the hook must be observed firing in a fresh session before the fix
+is considered shipped." That observation requires a trace line on the
+success path, not only on skip. alpha.5 fixed the threshold but left the
+verification surface asymmetric — users could verify a SKIP but not a FIRE.
+This release makes both observable with a single `grep`:
+
+```
+$ grep 'stop-handoff:' .harness/hook-trace.log
+[2026-05-06T...] stop-handoff: SKIP ctx=42% < threshold=50%
+[2026-05-06T...] stop-handoff: FIRE ctx=63% >= threshold=50%
+```
+
+### Verification
+
+- All 7 e2e cases continue to PASS — fixtures inspect `handoff.md`
+  presence/absence and SKIP-trace presence; FIRE-trace addition is purely
+  additive and does not affect the existing assertions.
+- All 6 baseline test suites still PASS (75/75 total).
+
+---
+
 ## [0.1.0-alpha.5] — 2026-05-06 — P0 hotfix: PCT gate threshold 70 → 50
 
 ### Fixed
