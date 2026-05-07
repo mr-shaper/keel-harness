@@ -7,6 +7,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.8] — 2026-05-06 — Handoff-must-ask gate (R16 three-piece + L45 candidate, sibling L24 fix)
+
+### Added
+
+- ✨ **`hooks/pre-tool-handoff-must-ask-gate.sh`**: new PreToolUse hook
+  that blocks Write/Edit/MultiEdit on `handoff-sN-to-sN+1.md` files unless
+  the originator is explicitly authorised. Three exempt paths:
+  (1) `HARNESS_HANDOFF_VIA_STOP=1` env (set by `stop-handoff-writer.sh`
+  on its own auto-write), (2) `HARNESS_HANDOFF_USER_OK=1` env (user
+  pre-set bypass), (3) a literal-keyword scan over the last 30 user
+  messages in the transcript looking for `write handoff` / `go handoff` /
+  `yes handoff` / `写 handoff` / `交接 handoff` / `生成 handoff` /
+  `写交接`. When none match, exit 2 with stderr lines that *enumerate*
+  the three PASS paths — a blocking gate that does not teach itself
+  wastes the user's time. (L43: matcher is the literal whitelist
+  `Write|Edit|MultiEdit`, never `*`. Internal regex
+  `handoff-s[0-9]+-to-s[0-9]+\.md$` keeps work proportional inside the
+  whitelist.)
+
+### Changed
+
+- 🔧 **`hooks/stop-handoff-writer.sh`**: at the top of the script (right
+  after `set -uo pipefail`), `export HARNESS_HANDOFF_VIA_STOP=1`. This
+  marks the subprocess so the new must-ask gate exempts the Stop hook's
+  legitimate auto-write while still blocking arbitrary AI writes from
+  elsewhere.
+
+- 🔧 **`templates/settings.json.template`**: registered the new hook as a
+  PreToolUse entry with an explicit `Write|Edit|MultiEdit` matcher and a
+  5-second timeout. Bumped `_harness_hooks_count` 11 → 12.
+
+- 🔧 **`manifest.json`**: added the new hook
+  (`hooks/pre-tool-handoff-must-ask-gate.sh`) to `kernel_files[]` so
+  `install.sh` Phase 1 ships it.
+
+- 📝 **`docs/r15-and-l44-candidate.md`**: appended the R16 sibling
+  pattern (PreToolUse hook + multiple exempt paths + default-block +
+  stderr education) and the L45 Cat-H candidate. Documents why R15 and
+  R16 are siblings (R15 governs growth, R16 governs creation; both rely
+  on the same hook discipline) and gives the recipe for applying R16 to
+  future restricted file patterns. Sibling-rule notes extended to
+  cover L24 (matcher-scope-mismatch — the reason R16 exists at all).
+
+### Why this matters
+
+The Stop-hook PCT gate (alpha.4–6) controls when the Stop hook *itself*
+writes a handoff. It does not — and cannot — control arbitrary Write
+tool calls from elsewhere in the session. An autonomous AI that decides
+to write `handoff-sN-to-sN+1.md` directly bypasses the PCT gate
+entirely. That is L24 (matcher-scope-mismatch) hitting in production:
+two different events, two different scopes, one rule covering only one
+of them.
+
+R16 is the sibling fix: a PreToolUse hook in the Write/Edit/MultiEdit
+scope, regex-filtered to handoff files only, with explicit auto-exempt
+for the legitimate Stop-hook originator. Together with the alpha.4–6
+PCT gate, the two rules give defense-in-depth: the Stop side governs
+*when* the Stop hook fires, the PreToolUse side governs *who* can fire
+a Write at all.
+
+### Verification
+
+- `bash -n` syntax PASS on the new hook.
+- Mock fixtures cover three scenarios:
+  - **A** — non-handoff path (`/tmp/dummy-PROJECT_STATE.md`): regex
+    miss → exit 0 silent.
+  - **B** — handoff path with no env and no transcript keyword:
+    `[HANDOFF-MUST-ASK] ❌ BLOCK` on stderr + exit 2.
+  - **C** — handoff path with `HARNESS_HANDOFF_VIA_STOP=1`:
+    `[HANDOFF-MUST-ASK] PASS: stop-handoff-writer env exempt` + exit 0.
+- All 7 e2e cases continue to PASS.
+- All 6 baseline test suites still PASS (75/75 total).
+
+### L43 compliance note
+
+The matcher in `settings.json.template` is a literal whitelist
+(`Write|Edit|MultiEdit`), not `*`. The internal regex filter
+(`handoff-s[0-9]+-to-s[0-9]+\.md$`) is anchored at end-of-string so
+sibling files (`handoff.md`, `handoff-required.flag`, `handoff-lite-*`)
+do *not* fire the gate. Matcher discipline + filter discipline together
+keep the hook proportional and self-locking-resistant.
+
+---
+
 ## [0.1.0-alpha.7] — 2026-05-06 — PROJECT_STATE size-gate forcing function (R15 three-piece + L44 candidate)
 
 ### Added

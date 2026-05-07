@@ -5,6 +5,11 @@
 # Exit: always 0 (best-effort, never block session end)
 
 set -uo pipefail
+# alpha.8: when the Stop hook auto-writes the handoff, mark the subprocess so
+# pre-tool-handoff-must-ask-gate.sh exempts the Write. (Otherwise the Stop
+# hook's own legitimate write would be blocked by the Write-side gate.)
+export HARNESS_HANDOFF_VIA_STOP=1
+
 # Note: removed `trap 'exit 0' ERR` (alpha.3) — on macOS bash 3.2, ERR trap fires
 # under pipefail even without `set -e`, which prematurely exited the script when
 # benign no-match globs (e.g. `ls handoff-S*-to-S*.md` in a fresh project)
