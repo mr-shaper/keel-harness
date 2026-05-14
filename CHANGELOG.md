@@ -7,6 +7,86 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.9] — 2026-05-14 — s51 Wave 2 R25 watcher cron PATH portable fix (Romeo P2 OSS guide cross-apply correctness)
+
+### Fixed (P0 真活体 bug)
+
+- 🔴 **`~/.claude/scripts/fork-bomb-fix-mtime-watcher.sh`**: macOS cron 默认
+  `PATH=/usr/bin:/bin` 不含 `/sbin`, BSD `md5` 在 `/sbin/md5` →
+  `command not found` → `$CURRENT=""` ≠ baseline → 假阳性
+  `FORK_BOMB_FIX_REVERT_DETECTED`. **真活体血例** 2026-05-14 alert log
+  12:00:01 + 12:15:02 两次假阳性 (CURRENT 段空白).
+
+### Added (3 layer defense-in-depth)
+
+- 🛡️ **Layer 1 watcher script**: 顶端 `export PATH="/usr/local/bin:/usr/bin:/bin:/sbin"`
+  + portable detect `MD5_CMD=$(command -v md5 \|\| command -v md5sum)`
+  (macOS/Linux 自适应) + exit code/empty check (R22 fail-close sibling)
+  + R18 atomic mv baseline init.
+
+- 🛡️ **Layer 2 crontab entry**: `PATH=/usr/local/bin:/usr/bin:/bin:/sbin`
+  显式前缀双保险, idempotent sed (防 duplicate entry).
+
+- 🛡️ **Layer 3 OSS guide §3.2 + §3.2.1**: 同步 watcher script + 新增
+  "⚠️ cron 环境注意" 段防 GitHub OSS 用户照搬踩坑. §4 Step 5 crontab install
+  命令同步加 PATH= 前缀 (Romeo P2 finding cross-apply correctness fix).
+
+- 📚 **KB decision MD**: `knowledge-base/raw/ai-systems/decision-s51-wave2-r25-cron-path-fix.md`
+  (290 LOC, 7 段) ingest via `kb-ingest-compile.sh --hint decision`
+  → `[COMPOUND-PASS]` 三铁律. `kb query "R25 cron PATH 假阳性"` rank 1
+  (score 43.35).
+
+- 🔖 **USER CLAUDE.md R25 律本体**: 加 `cron PATH 缺 /sbin` note + 触发词
+  3 新增 (`cron PATH 缺 /sbin` / `watcher 假阳性` / `Wave 2 cron 环境注意`).
+  v1.13 freeze 红线严守, 不加 Category H ratified 律 (R25 仍 candidate
+  maintenance reference).
+
+### Sprint methodology (P10-RATIFY 7 维 ≥0.99 hardcore gate)
+
+- 📋 **Implementation Plan**:
+  `docs/plans/2026-05-14-s51-wave2-r25-watcher-cron-path-fix.md`
+  (844 LOC, 16 section). 拓扑嵌套并行 4 层 (Harness ⊃ OODC ⊃ Superpower
+  Pipeline Phase A-D ⊃ PUA P10-9-8-7 真并行). TaskCreate 看板 8 task
+  + blocking chain (T3→T4→T5→T6,T7→T8). Phase 3 Wave A 5 P8 真并行
+  (同 message multi-Agent, 文件域 D1-D5 grep verify 0 collision).
+
+- 🔍 **P10 audit 4 round**: round-1 REJECT (6 fix) → round-2 REJECT (1 fix)
+  → round-3 REJECT (1 fix D5 OODC Observe/Orient 实证段) → round-4 RATIFY
+  全 7 维 ≥0.99 hardcore gate (D1=战略对齐, D2=文件域隔离, D3=Wave 真并行,
+  D4=TaskCreate 看板, D5=4 层嵌套, D6=Romeo audit, D7=verify
+  evidence-paste).
+
+- 🔬 **Romeo audit (Anthropic Sprint Contract)**: 5/5 P8 coverage (P8-A/B/C/D/E),
+  7 Q checklist. 找到 **1 真 bug** (OSS guide §4 Step 5 crontab install
+  cmd 缺 PATH= 前缀, OSS 用户照搬还踩坑) + 2 P2 traceability gap.
+  全 3 finding P9 inline 闭环修复.
+
+### Verification (12/12 PASS)
+
+- ✅ `env -i PATH=/usr/bin:/bin bash watcher.sh; echo exit=$?` → **exit=0**
+  (cron 真活体环境跑通)
+- ✅ alert log `FORK_BOMB_FIX_REVERT_DETECTED` 修后 0 hit
+- ✅ crontab PATH 显式 = 1 + idempotent = 1
+- ✅ OSS guide §3.2 portable detect = 10 hits, cron 环境注意段 = 3
+- ✅ KB decision MD ingest [COMPOUND-PASS] + kb query rank 1
+- ✅ USER CLAUDE.md R25 段 cron PATH 缺 /sbin = 1 + sibling 律 R10-R24
+  零触碰 (diff exit=0)
+- ✅ baseline 4 hash 不变 (锁定值 diff exit=0)
+- ✅ Romeo fix verify: OSS guide crontab install PATH= = 2, §3.2.2 dangling
+  = 0, R25 trigger 3 新词加入
+
+### Sibling 律 family (defense-in-depth, freeze 期 candidate maintenance reference)
+
+- **R13 v3.5** grep+tail 顺序律 — P8-A exit code check 是 fail-close 二层
+- **R17** metadata cache 同步 — Rollback Step 6 三层 cleanup
+- **R18** atomic write — P8-A baseline 用 mktemp + atomic mv
+- **R19 v2** 双机不对称 — Wave B sync to mini cross-peer (.claude-to-im mini only 排除)
+- **R22** fail-close — P8-A md5 失败 silent exit 0 不写假 alert
+- **R24** rsync --checksum (s51 sprint 1) — Wave B config-import 严守
+- **R25** mtime watcher (本 Wave 2 修法对象) — cron PATH note 完整化
+
+---
+
 ## [0.1.0-alpha.8] — 2026-05-06 — Handoff-must-ask gate (R16 three-piece + L45 candidate, sibling L24 fix)
 
 ### Added
